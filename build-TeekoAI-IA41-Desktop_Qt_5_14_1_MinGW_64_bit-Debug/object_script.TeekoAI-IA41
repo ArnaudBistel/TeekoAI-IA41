@@ -1,0 +1,14 @@
+board.o
+game.o
+home.o
+main.o
+mainwindow.o
+pawn.o
+player.o
+router.o
+moc_board.o
+moc_game.o
+moc_home.o
+moc_mainwindow.o
+moc_pawn.o
+moc_router.o

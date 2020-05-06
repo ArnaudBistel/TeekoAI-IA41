@@ -1,0 +1,15 @@
+
+créer classe qui hérite de QPushButton
+
+- forme ronde
+- taille passer à la création, dépend de la taille de la fenêtre et donc de celle de l'image
+- puis ajouter au tableau de bouton
+- puis positionné également suivant la taille de la fenêtre
+- on change la couleur en fonction de si sélectionné
+
+encore mettre  en place la confirmation par fenêtre de dialogue
+
+
+
+
+
