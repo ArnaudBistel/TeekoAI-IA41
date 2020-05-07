@@ -1,10 +1,5 @@
 #include "player.h"
 
-//Player::Player() : name(name), ia(ia)
-//{
-
-//}
-
 
 Player::Player(QString name, bool ia, int id) : name(name), ia(ia), id(id), played(), pion_on_board(), previous_index(-1)
 {
@@ -33,8 +28,6 @@ bool Player::operator== (Player &rhs)
 
 
 
-Move Player::chooseMove()
-{}
 
 // -------------------------------------------
 // ----------------- SETTERS -----------------
@@ -64,6 +57,11 @@ void Player::setPlayed(bool b)
 void Player::incrementPionOnBoard()
 {
     this->pion_on_board++;
+}
+
+void Player::setPionOnBoard(int p)
+{
+    this->pion_on_board = p;
 }
 
 

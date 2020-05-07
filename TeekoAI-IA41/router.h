@@ -23,10 +23,10 @@ public:
 
     // ------------- GETTERS -------------
     Board& getBoard();
-//    ResultsPage& getResultsPage();*/
 
 public slots:
     void changeOnglet(QString name);
+    void restartGame();
 
 private:
     // ------------- ATTRIBUTES -------------
@@ -35,8 +35,6 @@ private:
     Player *player1;
     Player *player2;
     Game *game;
-//    Board& board;
-//    ResultsPage *results_page
 
     friend class Board;
 };

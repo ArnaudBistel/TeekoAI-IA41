@@ -21,7 +21,7 @@ public slots:
 
 // encerclé quand sélectionné
 
-    void isSelected(bool);
+    void isSelected(bool, bool);
     void setSelectable(bool);
     void setColor(int);
     void setPlayer(int);

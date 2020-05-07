@@ -65,16 +65,16 @@ static const uint qt_meta_data_Pawn[] = {
  // slots: name, argc, parameters, tag, flags
        1,    0,   49,    2, 0x0a /* Public */,
        3,    0,   50,    2, 0x0a /* Public */,
-       4,    1,   51,    2, 0x0a /* Public */,
-       5,    1,   54,    2, 0x0a /* Public */,
-       6,    1,   57,    2, 0x0a /* Public */,
-       7,    1,   60,    2, 0x0a /* Public */,
-       8,    1,   63,    2, 0x0a /* Public */,
+       4,    2,   51,    2, 0x0a /* Public */,
+       5,    1,   56,    2, 0x0a /* Public */,
+       6,    1,   59,    2, 0x0a /* Public */,
+       7,    1,   62,    2, 0x0a /* Public */,
+       8,    1,   65,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Int,
     QMetaType::Bool,
-    QMetaType::Void, QMetaType::Bool,    2,
+    QMetaType::Void, QMetaType::Bool, QMetaType::Bool,    2,    2,
     QMetaType::Void, QMetaType::Bool,    2,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void, QMetaType::Int,    2,
@@ -93,7 +93,7 @@ void Pawn::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
         case 1: { bool _r = _t->isSelectable();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 2: _t->isSelected((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 2: _t->isSelected((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         case 3: _t->setSelectable((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 4: _t->setColor((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->setPlayer((*reinterpret_cast< int(*)>(_a[1]))); break;

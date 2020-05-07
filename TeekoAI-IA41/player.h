@@ -2,9 +2,7 @@
 #define PLAYER_H
 
 #include <QtWidgets>
-#include "move.h"
 #include <iostream>
-//#include "game.h"
 
 class Player
 {
@@ -22,7 +20,6 @@ public:
     bool chosePionToMove();
     int getPreviousIndex();
 private:
-    Move chooseMove();
 
     void setName(QString);
     void setIA(bool);
@@ -30,6 +27,7 @@ private:
     void setPlayed(bool);
     void setChosePionToMove(bool);
     void incrementPionOnBoard();
+    void setPionOnBoard(int);
     void setPreviousIndex(int);
 //    vector
 

@@ -3,7 +3,8 @@
 
 #include <QtWidgets>
 #include "iostream"
-#include "Pawn.h"
+#include "pawn.h"
+#include "playerpanel.h"
 
 typedef int (*pointer_to_arrays)[5];
 
@@ -15,135 +16,92 @@ public:
     Board();
     Board(QWidget *parent,QString name);
 
-    void displayWinLabel(QString);
+    // ------------- GETTERS -------------
+    pointer_to_arrays getBoard();
+    void printBoard();
+
 
     // ------------- SLOTS -------------
 public slots:
     void tileChosen();
-    pointer_to_arrays getBoard();
-//    pointer_to_arrays getBoard()
-//    {
-//        return this->board;
-//    }
-
-    /*
-    void changeButtonPosition();
-    void recordData();
-
-    void startCountdown();
-    void updateCountdown();
-    void stopCountdown();
-    void resetTest();
-    void goToResults();
-*/
-        void printBoard();
+    void resetGame();
     void goBack();
-    void announceCurrentPlayer(QString);
-    void prepareBoardForCurrentPlayer(int, int);
-    void placePion(int, int, int, bool, bool);
-    void initBoardVisible();
-    void initBoardInvisible();
-    void enableBoard();
-    void afficherDeplacementPossible(int,int);
-    void unselectPawn(int);
 
+    // ------------- SLOTS -------------
 signals:
     void changeInterface(QString name);
     void playerPlayed(int);
+    void beginGame();
+
 private:
+    // ------------- METHODS -------------
+    void placePion(int, int, int, bool, bool);
+    void displayPossibleMoves(int,int);
+    void unselectPawn(int);
+
+
+    void displayCurrentPlayer(int);
+    void displayPlayers(QString, QString);
+    void announceWinner(int, QString);
+    void displayWinLabel(QString);
+
+
+    void setBoardLabelEnabled(bool);
+    void prepareBoardForCurrentPlayer(int, int);
+    void enableBoard();
+    void initBoardVisible();
+    void initBoardInvisible();
+    void reinit();
 
     // ------------- ATTRIBUTES -------------
     int  board [5][5];
-    Pawn* array[5][5];
+    // ---- synchronization de thread ----
+    QMutex mutex;
+    QWaitCondition sleepSimulator;
+
 
     // ----------------------------------
-    // Instructions
-    // ----------------------------------
-//    QVBoxLayout *instructions_layout;
-//    QLabel *instructions_label;
-
-    // ----------------------------------
-    // Fenêtre de test
+    // Fenêtre du jeu
     // ----------------------------------
     QLabel *board_label;
-
-    QMutex mutex;
-QWaitCondition sleepSimulator;
-
-    QGridLayout *but_layout;
-    QPushButton *test_but1, *test_but2, *test_but3, *test_but4, *test_but5;
-    QPushButton *test_but11, *test_but12, *test_but13, *test_but14, *test_but15;
-    QPushButton *test_but21, *test_but22, *test_but23, *test_but24, *test_but25;
-    QPushButton *test_but31, *test_but32, *test_but33, *test_but34, *test_but35;
-    QPushButton *test_but41, *test_but42, *test_but43, *test_but44, *test_but45;
+    Pawn* array[5][5];
     QGridLayout *but_and_image_layout;
-
-
     QLabel *win_label;
-    QLabel *current_player_label;
-    // ----------------------------------
-    // Cible
-    // ----------------------------------
-//    QPushButton *click_me_button;
-//    QTimer *countdown_timer;
-//    QLabel *test_finished_label;
-//    QString *beep_file;
-//    QString *beeeep_file;
-//    QSound *beep_sound;
-//    QSound *beeeep_sound;
+
 
     // ----------------------------------
-    // back, reset and results
+    // Panneau affichant les joueurs
+    // ----------------------------------
+    QVBoxLayout *panel_layout;
+    QVBoxLayout *player1_layout;
+    QGroupBox *player1_groupbox;
+    QLabel *player1_name_label;
+    QLabel *player1_type_label;
+    QLabel *player1_color_label;
+    QGroupBox *player2_groupbox;
+    QVBoxLayout *player2_layout;
+    QLabel *player2_name_label;
+    QLabel *player2_type_label;
+    QLabel *player2_color_label;
+
+
+    // ----------------------------------
+    // retour et recommencer
     // ----------------------------------
     QHBoxLayout *bottom_buttons_layout;
     QPushButton *back_to_home_button;
-//    QPushButton *results_button;
     QPushButton *reset_button;
 
     // -------------------------------------
-    // vertical layout that contains all the widgets in the HomePage
+    // vertical layout that contains all the widgets
     // -------------------------------------
     QVBoxLayout *v_layout;
     QHBoxLayout *h_layout;
 
-    // ----------------------------------
-    // Paramètres de test
-    // ----------------------------------
-//    QElapsedTimer *test_timer;
-//    int click_count;
-//    int target_number;
-//    double a;
-//    double b;
-//    int target_size_mini;
-//    int target_size_max;
-//    FittsData *fitts_data;
-//    QPoint last_recorded_pos;
-
-
-    // ------------- METHODES -------------
-//    void testFinished();
-//    void initTarget();
-
-
-    // ------------- SETTERS -------------
-//    void setA(double a);
-//    void setB(double b);
-//    void setTargetNumber(int n);
-//    void setTargetSizeMini(int m);
-//    void setTargetSizeMax(int m);
-
-
-    // ------------- GETTERS -------------
-//    pointer_to_arrays getBoard();
-//    FittsData& getFittsData();
-
 
     // ------------- FRIENDS -------------
     friend class Game;
-//    friend class HomePage;
-//    friend class ResultsPage;
-
-
+    friend class Router;
 };
 
 #endif // BOARD_H

@@ -10,52 +10,34 @@ Game::Game(QWidget *parent) : player1(), player2(), current_player(), win(), boa
 
 
 
-//Game::Game(Board& the_board) : player1(), player2(), current_player(), win(), board()
-//{
-
-//}
-
-
-
 // -------------------------------------------
 // -------------- GAME METHODS ---------------
 // -------------------------------------------
 
 void Game::run()
 {
-//    cout << "dans run" << endl;
     this->chooseFirstPlayer();
-//     cout << "Joueur " << current_player->getName() << endl;
-
 
     while ( !this->win )
     {
-        static_cast<Router*>(this->parent)->getBoard().announceCurrentPlayer(current_player->getName());
-
-/*        this->current_player->play();
-
-*/
         while (!current_player->hasPlayed())
         {
-//            cout << "attente de jeu : " <<current_player->hasPlayed()<<  endl;
         }
 
         if (current_player->hasPlayed())
         {
 
             static_cast<Router*>(this->parent)->getBoard().printBoard();
-//            cout << "COUCOU" << endl;
 
             this->win = this->checkIfWins(current_player->getID());
             if (this->win)
             {
                 cout << current_player->getName().toStdString() << " a gagné !! " << endl;
-//                this->endGame(current_player->getName());
+                static_cast<Router*>(this->parent)->getBoard().announceWinner(current_player->getID(), current_player->getName());
             }
             else {
-              this->changeCurrentPlayer();
-              this->prepareBoardForNextTurn();
-              QThread::sleep(1);
+                this->changeCurrentPlayer();
+                this->prepareBoardForNextTurn();
             }
         }
 
@@ -63,11 +45,39 @@ void Game::run()
 }
 
 
+
+void Game::restartGame()
+{
+    static_cast<Router*>(this->parent)->getBoard().reinit();
+    this->win = false;
+    player1->setPlayed(false);
+    player1->setChosePionToMove(false);
+    player1->setPionOnBoard(0);
+    player1->setPreviousIndex(-1);
+    player2->setPlayed(false);
+    player2->setChosePionToMove(false);
+    player2->setPionOnBoard(0);
+    player2->setPreviousIndex(-1);
+
+    for(int i=0; i<5; i++)
+    {
+        for(int j=0; j<5; j++)
+        {
+            this->board[i][j]=0;
+        }
+    }
+    static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(true);
+
+}
+
+
+
 void Game::prepareBoardForNextTurn()
 {
     static_cast<Router*>(this->parent)->getBoard().prepareBoardForCurrentPlayer(current_player->getID(), current_player->pionOnBoard());
-              QThread::sleep(0.5);
+    QThread::msleep(200);
 }
+
 
 
 void Game::playerPlayed(int index)
@@ -78,10 +88,6 @@ void Game::playerPlayed(int index)
     // moins de 4 pions joués donc joueur place son jeton
     if (current_player->pionOnBoard() < 4)
     {
-//        cout << "line :" << line  << endl;
-//        cout << "col :" << col << endl;
-
-    cout << "dans player played de game" << endl;
         this->board[line][col] = this->current_player->getID();
         static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false);
 
@@ -97,8 +103,7 @@ void Game::playerPlayed(int index)
             this->board[line][col] = 0;
             this->current_player->setPreviousIndex(index);
             static_cast<Router*>(this->parent)->getBoard().placePion(0, line, col, true, true);
-//            static_cast<Router*>(this->parent)->getBoard().placePion(0, line, col);
-            static_cast<Router*>(this->parent)->getBoard().afficherDeplacementPossible(line, col);
+            static_cast<Router*>(this->parent)->getBoard().displayPossibleMoves(line, col);
 
         } else {
             this->board[line][col] = this->current_player->getID();
@@ -186,11 +191,6 @@ bool Game::checkCol(int id)
 }
 
 
-//void Game::endGame(QString name)
-//{
-//    displayWinLabel(name);
-//}
-
 
 bool Game::checkSquare(int id)
 {
@@ -235,9 +235,13 @@ void Game::chooseFirstPlayer()
     int random = (rand() % (MAX - MIN + 1)) + MIN;
     std::cout<<"random = "<<random<<" ";
     if (random > 50 )
+    {
         current_player = player1;
-    else {
+        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(1);
+
+    } else {
         current_player = player2;
+        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(2);
     }
 }
 
@@ -248,11 +252,13 @@ void Game::changeCurrentPlayer()
         player1->setPlayed(false);
         player1->setChosePionToMove(false);
         current_player = player2;
+        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(2);
     }else
     {
         player2->setPlayed(false);
         player2->setChosePionToMove(false);
         current_player = player1;
+        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(1);
     }
 }
 

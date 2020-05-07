@@ -13,13 +13,12 @@ class Game : public QThread
 
 public:
     Game(QWidget *parent = 0);
-//    Game(Board&);
 
 
     // -------------- GAME METHODS ---------------
     bool checkIfWins(int);
     void run() override;
-
+    void restartGame();
 
     // -------------- BOARD METHODS --------------
     bool checkRows(int);
@@ -44,13 +43,13 @@ public:
 
 public slots:
     void playerPlayed(int);
-private:
 
+
+private:
 
     // ------------- ATTRIBUTES -------------
     Player *player1, *player2, *current_player;
     bool win;
-//    Board *board;
     int  board [5][5];
     QWidget *parent;
 

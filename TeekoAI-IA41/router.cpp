@@ -1,7 +1,6 @@
 #include "Router.h"
 
 
-
 // Classe qui hérite de QStackedWidget et permet donc de transiter entre
 // les différentes pages de l'application
 Router::Router()
@@ -13,33 +12,34 @@ Router::Router()
 
     board = new Board(this, "board");
     this->addWidget(static_cast<QWidget*>(board));
-//    game = new Game;
-
-//    results_page = new ResultsPage(this, "results_page");
-//    this->addWidget(static_cast<QWidget*>(results_page));
 
     this->setCurrentWidget(home);
     setWindowFlags(Qt::MSWindowsFixedSizeDialogHint);
+
+
 }
 
 
-
-// -----------------------------------
-// ------------- GETTERS -------------
-// -----------------------------------
-
-
-Board& Router::getBoard()
+void Router::restartGame()
 {
-    return *board;
+    game->terminate();
+    qDebug() << "try to stop thread";
+
+    while(!game->isFinished()){}
+
+    if(!game->isRunning())
+    {
+        qDebug() << "thread is stopped";
+        game->restartGame();
+//        QThread::msleep(300);
+        qDebug() << "READY TOO !!!!";
+        this->setCurrentWidget(board);
+        game->start();
+    }
+
 }
 
-/*
-ResultsPage& Router::getResultsPage()
-{
-    return *results_page;
-}
-*/
+
 
 Router::~Router()
 {}
@@ -60,31 +60,40 @@ void Router::changeOnglet(QString name)
         if (home->isIAVsIA())
         {
             mode = 1;
+            board->displayPlayers("IA", "IA");
         }
         else if (home->isHumanVsIA())
         {
             mode = 2;
+            board->displayPlayers("HUMAN", "IA");
         }
 
         else if (home->isHumanVsHuman())
         {
             mode = 3;
+            board->displayPlayers("HUMAN", "HUMAN");
         }
 
         game->setMode(mode);
         game->start();
 
         this->setCurrentWidget(board);
-//        fitts_page->startCountdown();
         return;
     }
-//    else if((name == results_page->objectName()) && results_page)
-//    {
-//        this->setCurrentWidget(results_page);
-//        return;
-//    }
+
     else
     {
         QMessageBox::information(0,tr("Erreur changement onglet"),tr("Impossible de changer l'interface pour l'onglet ")+name+tr(".\nCet onglet n'existe plus ou n'a pas été créer."));
     }
+}
+
+
+// -----------------------------------
+// ------------- GETTERS -------------
+// -----------------------------------
+
+
+Board& Router::getBoard()
+{
+    return *board;
 }

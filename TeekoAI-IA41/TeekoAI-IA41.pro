@@ -24,6 +24,7 @@ SOURCES += \
     mainwindow.cpp \
     pawn.cpp \
     player.cpp \
+    playerpanel.cpp \
     router.cpp
 
 HEADERS += \
@@ -31,9 +32,9 @@ HEADERS += \
     game.h \
     home.h \
     mainwindow.h \
-    move.h \
     pawn.h \
     player.h \
+    playerpanel.h \
     router.h
 
 FORMS += \
