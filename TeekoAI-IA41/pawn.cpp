@@ -103,7 +103,7 @@ void Pawn::setColor(int c)
 
         QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
         effect->setBlurRadius(3); //Adjust accordingly
-        effect->setOffset(5,5); //Adjust accordingly
+        effect->setOffset(3,3); //Adjust accordingly
         this->setGraphicsEffect(effect);
 
     }
@@ -122,7 +122,7 @@ void Pawn::setColor(int c)
 
         QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
         effect->setBlurRadius(3); //Adjust accordingly
-        effect->setOffset(5,5); //Adjust accordingly
+        effect->setOffset(3,3); //Adjust accordingly
         this->setGraphicsEffect(effect);
 
     }

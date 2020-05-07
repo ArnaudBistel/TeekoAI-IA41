@@ -35,7 +35,7 @@ signals:
 
 private:
     // ------------- METHODS -------------
-    void placePion(int, int, int, bool, bool);
+    void placePion(int, int, int, bool, bool, bool);
     void displayPossibleMoves(int,int);
     void unselectPawn(int);
 
@@ -46,6 +46,7 @@ private:
     void displayWinLabel(QString);
 
 
+    void deletePossibleMoves();
     void setBoardLabelEnabled(bool);
     void prepareBoardForCurrentPlayer(int, int);
     void enableBoard();

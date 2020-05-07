@@ -89,7 +89,7 @@ void Game::playerPlayed(int index)
     if (current_player->pionOnBoard() < 4)
     {
         this->board[line][col] = this->current_player->getID();
-        static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false);
+        static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false, false);
 
         this->current_player->incrementPionOnBoard();
         this->current_player->setPlayed(true);
@@ -102,15 +102,24 @@ void Game::playerPlayed(int index)
             this->current_player->setChosePionToMove(true);
             this->board[line][col] = 0;
             this->current_player->setPreviousIndex(index);
-            static_cast<Router*>(this->parent)->getBoard().placePion(0, line, col, true, true);
+            static_cast<Router*>(this->parent)->getBoard().placePion(0, line, col, true, true, false);
             static_cast<Router*>(this->parent)->getBoard().displayPossibleMoves(line, col);
 
         } else {
-            this->board[line][col] = this->current_player->getID();
-            static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false);
-            this->current_player->setPlayed(true);
-            static_cast<Router*>(this->parent)->getBoard().unselectPawn(current_player->getPreviousIndex());
+            // cas où joueur déselctionne son pion pour en choisir un autre
+            if (index == this->current_player->getPreviousIndex())
+            {
+                this->current_player->setChosePionToMove(false);
+                static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, true, true);
+                this->board[line][col] = current_player->getID();
+                this->prepareBoardForNextTurn();
 
+            } else {
+                this->board[line][col] = this->current_player->getID();
+                static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false, false);
+                this->current_player->setPlayed(true);
+                static_cast<Router*>(this->parent)->getBoard().unselectPawn(current_player->getPreviousIndex());
+            }
         }
         // puis le placer
     }

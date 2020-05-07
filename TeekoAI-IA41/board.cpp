@@ -42,8 +42,8 @@ Board::Board(QWidget *parent, QString name):
     int screen_width = window.width();
     double board_size = screen_height * 3/4;
     board_label->setFixedSize(board_size, board_size);
-    QPixmap board_image("./res/teeko_board_v.png");
-//    QPixmap board_image("../res/teeko_board_v.png");
+//    QPixmap board_image("./res/teeko_board_v.png");
+    QPixmap board_image("../res/teeko_board_v.png");
     board_label->setPixmap(board_image);
     board_label->setScaledContents( true );
 
@@ -105,8 +105,8 @@ Board::Board(QWidget *parent, QString name):
     player1_type_label->setFont(QFont("Comic Sans MS", 12));
     player1_type_label->setAlignment(Qt::AlignHCenter);
     player1_color_label = new QLabel;
-    QPixmap pix("./res/blue_pawn.png");
-//    QPixmap pix("../res/blue_pawn.png");
+//    QPixmap pix("./res/blue_pawn.png");
+    QPixmap pix("../res/blue_pawn.png");
     player1_color_label->setPixmap(pix.scaled((board_label->height() / 8.1) - 10 , (board_label->height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
     player1_layout->addWidget(player1_name_label);
@@ -129,8 +129,8 @@ Board::Board(QWidget *parent, QString name):
     player2_type_label->setFont(QFont("Comic Sans MS", 12));
     player2_type_label->setAlignment(Qt::AlignHCenter);
     player2_color_label = new QLabel;
-    QPixmap pix2("./res/red_pawn.png");
-//    QPixmap pix2("../res/red_pawn.png");
+//    QPixmap pix2("./res/red_pawn.png");
+    QPixmap pix2("../res/red_pawn.png");
     player2_color_label->setPixmap(pix2.scaled((board_label->height() / 8.1) - 10 , (board_label->height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
     player2_layout->addWidget(player2_name_label);
@@ -181,16 +181,23 @@ Board::Board(QWidget *parent, QString name):
 // ------------------------------------
 
 
-void Board::placePion(int id, int line, int col, bool selected, bool more_than_4)
+void Board::placePion(int id, int line, int col, bool selected, bool more_than_4, bool unselected)
 {
     this->board[line][col] = id;
+    // pion sélectionné
     if (selected)
     {
         this->array[line][col]->isSelected(true, false);
-    } else if (more_than_4)
+    } else if (more_than_4 && !unselected)
     {
         this->array[line][col]->isSelected(false, false);
         this->array[line][col]->setPlayer(id);
+    } else if (more_than_4 && unselected)
+    {
+//        this->deletePossibleMoves();
+        this->array[line][col]->isSelected(false, false);
+        this->array[line][col]->setPlayer(id);
+//        board_label->setEnabled(true);
     } else {
         this->array[line][col]->setPlayer(id);
     }
@@ -198,11 +205,26 @@ void Board::placePion(int id, int line, int col, bool selected, bool more_than_4
 
 
 
+void Board::deletePossibleMoves()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            if (array[i][j]->isSelectable()) array[i][j]->setSelectable(false);
+        }
+    }
+}
+
+
 // affiche les déplacements possible après qu'un joueur a sélectionné un pion
 void Board::displayPossibleMoves(int line, int col)
 {
     board_label->setEnabled(true);
     this->enableBoard();
+
+    // peut déselctionner le pion sélectionné
+    this->array[line][col]->setEnabled(true);
 
     if (line - 1 >= 0 && col - 1 >= 0 )
     {
