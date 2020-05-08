@@ -4,6 +4,8 @@
 #include <QtWidgets>
 #include <iostream>
 
+
+// Classe qui représente un joueur
 class Player
 {
 
@@ -12,6 +14,7 @@ public:
     Player& operator= (const Player& pl);
     bool operator== (Player &rhs);
 
+    // ------------- GETTERS -------------
     QString getName();
     bool isIA();
     int getID();
@@ -19,8 +22,10 @@ public:
     int pionOnBoard();
     bool chosePionToMove();
     int getPreviousIndex();
+
 private:
 
+    // ------------- SETTERS -------------
     void setName(QString);
     void setIA(bool);
     void setID(int);
@@ -29,8 +34,8 @@ private:
     void incrementPionOnBoard();
     void setPionOnBoard(int);
     void setPreviousIndex(int);
-//    vector
 
+    // ------------- ATTRIBUTES -------------
     QString name;
     bool ia;
     int id;
@@ -39,6 +44,7 @@ private:
     bool chose_pion_to_move;
     int previous_index;
 
+    // ------------- FRIENDS -------------
     friend class Router;
     friend class Game;
 };

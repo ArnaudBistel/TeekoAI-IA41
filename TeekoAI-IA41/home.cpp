@@ -1,6 +1,7 @@
 #include "home.h"
 #include "Router.h"
 
+
 Home::Home(QWidget *parent, QString name):
     QWidget(parent)
 {
@@ -28,23 +29,22 @@ Home::Home(QWidget *parent, QString name):
     title_layout->addWidget(title_label);
 
 
+
     // -------------------------------------
-    // Game configuration
+    // Box de congfiguration du mode de jeu
     // -------------------------------------
     configuration_box = new QGroupBox(tr("Mode de jeu"), this);
-
     configuration_form = new QFormLayout;
-//    configuration_form->setVerticalSpacing(15);
+    //configuration_form->setVerticalSpacing(15);
     configuration_form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-
-    // nombre de cibles
-
 
     button_ia_vs_ia = new QRadioButton(this);
     connect(button_ia_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
+
     button_human_vs_ia = new QRadioButton(this);
     button_human_vs_ia->setChecked(true);
     connect(button_human_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
+
     button_human_vs_human = new QRadioButton(this);
     connect(button_human_vs_human, SIGNAL(clicked()), this, SLOT(disableDifficultyChoice()));
 
@@ -57,17 +57,12 @@ Home::Home(QWidget *parent, QString name):
 
 
     // -------------------------------------
-    // difficulty box
+    // Box de configuration de la difficulté
     // -------------------------------------
     difficulty_box = new QGroupBox(tr("Force de l'IA"), this);
-
-    // formulaire de configuration du test
     difficulty_form = new QFormLayout;
-//    configuration_form->setVerticalSpacing(15);
+    //configuration_form->setVerticalSpacing(15);
     difficulty_form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-
-    // nombre de cibles
-
 
     button_easy = new QRadioButton(this);
     button_medium = new QRadioButton(this);
@@ -84,7 +79,7 @@ Home::Home(QWidget *parent, QString name):
 
 
     // -------------------------------------
-    // layout qui contient les deux box
+    // layout qui contient les deux box de configuration
     // -------------------------------------
     params_layout = new QVBoxLayout;
     params_layout->addWidget(configuration_box);
@@ -92,8 +87,9 @@ Home::Home(QWidget *parent, QString name):
     params_layout->addWidget(difficulty_box);
     params_layout->setAlignment(Qt::AlignHCenter);
 
+
     // -------------------------------------
-    // quit / start buttons
+    // quitter / commencer / recommencer
     // -------------------------------------
     buttons_layout = new QHBoxLayout;
 
@@ -112,12 +108,13 @@ Home::Home(QWidget *parent, QString name):
     connect(start_button, SIGNAL(clicked()), this, SLOT(launch_game()));
     buttons_layout->addWidget(start_button);
 
+
     // -------------------------------------
-    // vertical layout that contains all the widgets in the Home
+    // vertical et horizontal layouts qui contiennent tous les widgets de Home
     // -------------------------------------
     vertical_layout = new QVBoxLayout();
     vertical_layout->addLayout(title_layout);
-//    vertical_layout->insertSpacing(1, screen_height * 1/7);
+    //vertical_layout->insertSpacing(1, screen_height * 1/7);
     vertical_layout->addLayout(params_layout);
     vertical_layout->insertSpacing(3, screen_height * 1/7);
     vertical_layout->addLayout(buttons_layout);
@@ -127,27 +124,31 @@ Home::Home(QWidget *parent, QString name):
 
 
 
-// envoie l'utilisateur sur la page de test
-// en passant à FittsTestWindow les param du test
+// envoie l'utilisateur sur la page du jeu
 void Home::launch_game()
 {
     emit changeInterface("board");
+    // les boutons de la page d'accueil évolue une fois le jeu lancé une première fois
     this->start_button->setText("Continuer");
     this->restart_button->setVisible(true);
 }
 
 
+
+// si une IA est choisie dans le mode de jeu
+// on peut modifier sa force
 void Home::enableDifficultyChoice()
 {
-//    std::cout << "test : " << b <<std::endl;
     this->button_easy->setEnabled(true);
     this->button_medium->setEnabled(true);
     this->button_hard->setEnabled(true);
 }
 
+
+// si aucune IA n'est choisie dans le mode de jeu
+// on ne peut pas modifier sa force
 void Home::disableDifficultyChoice()
 {
-//    std::cout << "test : " << b <<std::endl;
     this->button_easy->setEnabled(false);
     this->button_medium->setEnabled(false);
     this->button_hard->setEnabled(false);

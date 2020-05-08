@@ -16,17 +16,16 @@ public:
 
 
     // -------------- GAME METHODS ---------------
-    bool checkIfWins(int);
     void run() override;
     void restartGame();
+    bool checkIfWins(int);
+    void prepareBoardForNextTurn();
 
     // -------------- BOARD METHODS --------------
     bool checkRows(int);
     bool checkCol(int);
     bool checkSquare(int);
     void printBoard();
-    void prepareBoardForNextTurn();
-//    void endGame(QString);
 
     // ------------- PLAYERS METHODS -------------
     void chooseFirstPlayer();

@@ -20,10 +20,11 @@ public:
     Router();
     ~Router();
 
-
     // ------------- GETTERS -------------
     Board& getBoard();
 
+
+    // ------------- SLOTS -------------
 public slots:
     void changeOnglet(QString name);
     void restartGame();
@@ -36,6 +37,7 @@ private:
     Player *player2;
     Game *game;
 
+    // ------------- FRIENDS -------------
     friend class Board;
 };
 

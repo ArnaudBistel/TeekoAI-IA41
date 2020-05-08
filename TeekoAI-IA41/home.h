@@ -4,8 +4,10 @@
 #include <QtWidgets>
 #include <iostream>
 #include "player.h"
-//#include
 
+// classe de la page d'accueil du jeu qui permet de configurer le jeu
+// Le mode : IA vs IA, IA vs Humain, Humain vs Humain
+// Ainsi que la difficulté si une IA est impliquée
 class Home : public QWidget
 {
     Q_OBJECT
@@ -14,6 +16,8 @@ public:
     Home(QWidget *parent,QString name);
     ~Home();
 
+
+    // ------------- SLOTS -------------
 public slots:
     void launch_game();
     void enableDifficultyChoice();
@@ -23,10 +27,15 @@ public slots:
     bool isHumanVsIA();
     bool isHumanVsHuman();
 
+
+    // ------------- SIGNALS -------------
 signals:
     void changeInterface(QString name);
 
+
 private:
+
+    // ------------- ATTRIBUTES -------------
 
     // -------------------------------------
     // top layout, contient le titre de l'app
@@ -36,7 +45,7 @@ private:
 
 
     // -------------------------------------
-    // mode box
+    // Box de congfiguration du mode de jeu
     // -------------------------------------
     QGroupBox *configuration_box;
     QFormLayout *configuration_form;
@@ -44,12 +53,9 @@ private:
     QRadioButton *button_human_vs_ia;
     QRadioButton *button_ia_vs_ia;
 
-//    QSpinBox *target_number_spinbox;
-//    QSpinBox *target_mini_size_spinbox;
-//    QSpinBox *target_max_size_spinbox;
 
     // -------------------------------------
-    // difficulté box
+    // Box de configuration de la difficulté
     // -------------------------------------
     QGroupBox *difficulty_box;
     QFormLayout *difficulty_form;
@@ -57,8 +63,9 @@ private:
     QRadioButton *button_medium;
     QRadioButton *button_hard;
 
+
     // -------------------------------------
-    // quit / start buttons
+    // quitter / commencer / recommencer
     // -------------------------------------
     QHBoxLayout *buttons_layout;
     QPushButton *quit_button;
@@ -67,7 +74,7 @@ private:
 
 
     // -------------------------------------
-    // vertical layout that contains all the widgets in the Home
+    // vertical et horizontal layouts qui contiennent tous les widgets de Home
     // -------------------------------------
     QVBoxLayout *vertical_layout;
     QVBoxLayout *params_layout;

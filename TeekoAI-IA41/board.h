@@ -4,7 +4,6 @@
 #include <QtWidgets>
 #include "iostream"
 #include "pawn.h"
-#include "playerpanel.h"
 
 typedef int (*pointer_to_arrays)[5];
 
@@ -27,24 +26,17 @@ public slots:
     void resetGame();
     void goBack();
 
-    // ------------- SLOTS -------------
+    // ------------- SIGNALS -------------
 signals:
     void changeInterface(QString name);
     void playerPlayed(int);
     void beginGame();
 
 private:
-    // ------------- METHODS -------------
+    // ---------- PAWN & BOARD METHODS ----------
     void placePion(int, int, int, bool, bool, bool);
     void displayPossibleMoves(int,int);
     void unselectPawn(int);
-
-
-    void displayCurrentPlayer(int);
-    void displayPlayers(QString, QString);
-    void announceWinner(int, QString);
-    void displayWinLabel(QString);
-
 
     void deletePossibleMoves();
     void setBoardLabelEnabled(bool);
@@ -54,9 +46,17 @@ private:
     void initBoardInvisible();
     void reinit();
 
+    // ------------- PLAYERS METHODS ------------
+    void displayCurrentPlayer(int);
+    void displayPlayers(QString, QString);
+    void announceWinner(int, QString);
+    void displayWinLabel(QString);
+
+
+
     // ------------- ATTRIBUTES -------------
     int  board [5][5];
-    // ---- synchronization de thread ----
+    // synchronization de thread
     QMutex mutex;
     QWaitCondition sleepSimulator;
 

@@ -3,6 +3,8 @@
 
 // Classe qui hérite de QStackedWidget et permet donc de transiter entre
 // les différentes pages de l'application
+
+// CONSTRUCTOR
 Router::Router()
 {
     game = new Game(this);
@@ -13,15 +15,16 @@ Router::Router()
     board = new Board(this, "board");
     this->addWidget(static_cast<QWidget*>(board));
 
+    // home est la page d'accueil de l'app
     this->setCurrentWidget(home);
     setWindowFlags(Qt::MSWindowsFixedSizeDialogHint);
-
-
 }
 
 
+// recommencer une partie après appuie d'un des boutons Recommencer
 void Router::restartGame()
 {
+    // stop thread du jeu
     game->terminate();
     qDebug() << "try to stop thread";
 
@@ -30,10 +33,15 @@ void Router::restartGame()
     if(!game->isRunning())
     {
         qDebug() << "thread is stopped";
+        // réinitialise le jeu
         game->restartGame();
 //        QThread::msleep(300);
         qDebug() << "READY TOO !!!!";
+
+        // affiche la page de jeu
         this->setCurrentWidget(board);
+
+        // démarre le threzad du jeu
         game->start();
     }
 
@@ -41,21 +49,22 @@ void Router::restartGame()
 
 
 
-Router::~Router()
-{}
-
-
 //Controlleur : slot pour changer de page
+// Méthode de routage
 void Router::changeOnglet(QString name)
 {
-
+    // Home, page d'accueil
     if((name == home->objectName()) && home)
     {
         this->setCurrentWidget(home);
         return;
     }
+
+    // Board, page du jeu
     else if((name == board->objectName()) && board)
     {
+        // on récupère les paramètres de configuration et les transmets à
+        // Game et au board
         int mode = 0;
         if (home->isIAVsIA())
         {
@@ -75,8 +84,10 @@ void Router::changeOnglet(QString name)
         }
 
         game->setMode(mode);
-        game->start();
 
+        // lance le thread de jeu
+        game->start();
+        // affiche la page de jeu
         this->setCurrentWidget(board);
         return;
     }
@@ -97,3 +108,9 @@ Board& Router::getBoard()
 {
     return *board;
 }
+
+
+
+
+Router::~Router()
+{}

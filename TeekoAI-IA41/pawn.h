@@ -11,30 +11,31 @@ class Pawn : public QPushButton
 public:
     Pawn(const QString &text, QWidget *parent);
 
+    // ------------- GETTERS -------------
+    int getIndex();
+    bool isSelectable();
 
     // ------------- SLOTS -------------
 public slots:
 
-    int getIndex();
-
-    bool isSelectable();
-
-// encerclé quand sélectionné
-
+    // ------------- SETTERS -------------
     void isSelected(bool, bool);
     void setSelectable(bool);
     void setColor(int);
     void setPlayer(int);
     void setIndex(int);
 
-
 private:
 
+    // ------------- ATTRIBUTES -------------
     int index;
     int color;
     bool selected;
     int player;
     bool selectable;
+
+    // ------------- METHODS -------------
+    void setShadow(int, int);
 
 };
 

@@ -21,24 +21,20 @@ SOURCES += \
     game.cpp \
     home.cpp \
     main.cpp \
-    mainwindow.cpp \
     pawn.cpp \
     player.cpp \
-    playerpanel.cpp \
     router.cpp
 
 HEADERS += \
     board.h \
     game.h \
     home.h \
-    mainwindow.h \
     pawn.h \
     player.h \
     playerpanel.h \
     router.h
 
-FORMS += \
-    mainwindow.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
