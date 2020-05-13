@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game.h" //test
 #include "Router.h"
 
 // Classe qui contient la logique du jeu.
