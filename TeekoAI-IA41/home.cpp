@@ -72,7 +72,6 @@ Home::Home(QWidget *parent, QString name):
     difficulty_form->addRow("Facile\t\t", button_easy);
     difficulty_form->addRow("Moyen\t\t", button_medium);
     difficulty_form->addRow("Difficile\t\t", button_hard);
-//    connect(target_number_spinbox, SIGNAL(valueChanged(int)), this, SLOT(setTargetNumber(int)));
 
     difficulty_box->setLayout(difficulty_form);
     difficulty_box->setMaximumSize(QSize((int) window_width , (int) window_height * 0.33));
@@ -171,6 +170,25 @@ bool Home::isHumanVsHuman()
 {
     return this->button_human_vs_human->isChecked();
 }
+
+bool Home::isEasy()
+{
+    return this->button_easy->isChecked();
+}
+
+
+bool Home::isMedium()
+{
+    return this->button_medium->isChecked();
+}
+
+
+bool Home::isHard()
+{
+    return this->button_hard->isChecked();
+}
+
+
 
 
 Home::~Home()

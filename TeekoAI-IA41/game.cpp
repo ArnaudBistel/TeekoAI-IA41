@@ -323,23 +323,6 @@ void Game::changeCurrentPlayer()
 }
 
 
-// Gestion de l'IA
-void Game::setMode(int mode)
-{
-    if (mode == 1)
-    {
-        player1 = new IAPlayer("Joueur 1", 1);
-        player2 = new IAPlayer("Joueur 2", 2);
-    } else if (mode == 2) {
-        player1 = new Player("Joueur 1", false, 1);
-        player2 = new IAPlayer("Joueur 2", 2);
-    } else if (mode == 3) {
-        player1 = new Player("Joueur 1", false, 1);
-        player2 = new IAPlayer("Joueur 2", 2);
-    }
-}
-
-
 
 // -------------------------------------------
 // ----------------- SETTERS -----------------
@@ -357,6 +340,25 @@ void Game::setPlayer2(Player pl)
     this->player2 = &pl;
     this->player2->isIA();
 }
+
+
+
+// Gestion de l'IA
+void Game::setMode(int mode, int diff)
+{
+    if (mode == 1)
+    {
+        player1 = new IAPlayer("Joueur 1", 1, diff);
+        player2 = new IAPlayer("Joueur 2", 2, diff);
+    } else if (mode == 2) {
+        player1 = new Player("Joueur 1", false, 1);
+        player2 = new IAPlayer("Joueur 2", 2, diff);
+    } else if (mode == 3) {
+        player1 = new Player("Joueur 1", false, 1);
+        player2 = new Player("Joueur 2", false, 2);
+    }
+}
+
 
 
 

@@ -31,9 +31,9 @@ public:
     // ------------- PLAYERS METHODS -------------
     void chooseFirstPlayer();
     void changeCurrentPlayer();
-    void setMode(int);
 
     // ------------- SETTERS -------------
+    void setMode(int, int);
     void setPlayer1(Player pl);
     void setPlayer2(Player pl);
 

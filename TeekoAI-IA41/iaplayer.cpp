@@ -1,7 +1,7 @@
 #include "iaplayer.h"
 
-IAPlayer::IAPlayer(QString name, int id )
-    : Player(name, true, id), move()
+IAPlayer::IAPlayer(QString name, int id, int difficulty )
+    : Player(name, true, id), move(), difficulty(difficulty)
 {
 }
 
@@ -11,10 +11,18 @@ int IAPlayer::getIAMove(int  board [5][5])
     return this->move;
 }
 
+
+int IAPlayer::getDifficulty()
+{
+    return this->difficulty;
+}
+
 void IAPlayer::findMove(int  board [5][5])
 {
     std::vector< int > pawns;
+    int move(-1);
 
+    // récupère la liste des index des pions de l'IA
     for(int i=0; i<5; i++)
     {
         for(int j=0; j<5; j++)
@@ -26,34 +34,47 @@ void IAPlayer::findMove(int  board [5][5])
         }
     }
 
-    int random(-1);
-    if (this->pionOnBoard() >= 4 && !this->chosePionToMove()) {
-        int MAX = 3, MIN = 0;
-        srand(time(NULL));
-        random = (rand() % (MAX - MIN + 1)) + MIN;
-        std::cout << "move : " << random << std::endl;
-        random = pawns[random];
+    // Difficulté facile
+//    if (this->difficulty == 1 )
+//    {
+        if (this->pionOnBoard() >= 4 && !this->chosePionToMove()) {
+            int MAX = 3, MIN = 0;
+            srand(time(NULL));
+            move = (rand() % (MAX - MIN + 1)) + MIN;
+            std::cout << "move : " << move << std::endl;
+            move = pawns[move];
 
-    } else if (this->pionOnBoard() >= 4 && this->chosePionToMove())
-    {
-        pawns = this->computePossibleMoves(this->previous_index, board);
-        int MAX = pawns.size() - 1;
-        int MIN = 0;
-        srand(time(NULL));
-        random = (rand() % (MAX - MIN + 1)) + MIN;
-        std::cout << "move : " << random << std::endl;
-        random = pawns[random];
+        } else if (this->pionOnBoard() >= 4 && this->chosePionToMove())
+        {
+            pawns = this->computePossibleMoves(this->previous_index, board);
+            int MAX = pawns.size() - 1;
+            int MIN = 0;
+            srand(time(NULL));
+            move = (rand() % (MAX - MIN + 1)) + MIN;
+            std::cout << "move : " << move << std::endl;
+            move = pawns[move];
 
-    } else if (this->pionOnBoard() < 4) {
-        int MAX = 24, MIN = 0;
+        } else if (this->pionOnBoard() < 4) {
+            int MAX = 24, MIN = 0;
 
-        // Génération du nombre aléatoire
-        srand(time(NULL));
-        random = (rand() % (MAX - MIN + 1)) + MIN;
-        std::cout << "move : " << random << std::endl;
-    }
+            // Génération du nombre aléatoire
+            srand(time(NULL));
+            move = (rand() % (MAX - MIN + 1)) + MIN;
+            std::cout << "move : " << move << std::endl;
+        }
+//    }
 
-    this->move = random;
+
+    // Difficulté Moyenne
+//    else if (this->difficulty == 2 )
+//    {
+
+
+//    // Difficulté difficile
+//    }else if (this->difficulty == 3 )
+//    {
+//    }
+    this->move = move;
 }
 
 
