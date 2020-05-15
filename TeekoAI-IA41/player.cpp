@@ -29,6 +29,7 @@ bool Player::operator== (Player &rhs)
 
 
 
+
 // -------------------------------------------
 // ----------------- SETTERS -----------------
 // -------------------------------------------
@@ -116,4 +117,9 @@ bool Player::chosePionToMove()
 int Player::getPreviousIndex()
 {
     return this->previous_index;
+}
+
+int Player::getIAMove(int  board [5][5])
+{
+    return -1;
 }

@@ -1,6 +1,7 @@
 board.o
 game.o
 home.o
+iaplayer.o
 main.o
 pawn.o
 player.o

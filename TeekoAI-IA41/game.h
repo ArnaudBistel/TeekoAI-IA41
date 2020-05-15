@@ -2,6 +2,7 @@
 #define GAME_H
 #include <QtWidgets>
 #include "player.h"
+#include "iaplayer.h"
 #include "board.h"
 
 #include <iostream>

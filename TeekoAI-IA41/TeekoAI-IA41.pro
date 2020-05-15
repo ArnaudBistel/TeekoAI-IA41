@@ -20,6 +20,7 @@ SOURCES += \
     board.cpp \
     game.cpp \
     home.cpp \
+    iaplayer.cpp \
     main.cpp \
     pawn.cpp \
     player.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     board.h \
     game.h \
     home.h \
+    iaplayer.h \
     pawn.h \
     player.h \
     playerpanel.h \

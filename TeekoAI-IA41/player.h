@@ -23,7 +23,7 @@ public:
     bool chosePionToMove();
     int getPreviousIndex();
 
-private:
+protected:
 
     // ------------- SETTERS -------------
     void setName(QString);
@@ -43,6 +43,9 @@ private:
     int pion_on_board;
     bool chose_pion_to_move;
     int previous_index;
+
+private:
+    virtual int getIAMove(int  board [5][5]);
 
     // ------------- FRIENDS -------------
     friend class Router;
