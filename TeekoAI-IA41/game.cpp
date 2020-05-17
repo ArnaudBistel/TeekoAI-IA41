@@ -1,13 +1,13 @@
-#include "game.h" //test
+#include "game.h"
 #include "router.h"
-Test
+
 // Classe qui contient la logique du jeu.
 
 // CONSTRUCTOR
 Game::Game(QWidget *parent) : player1(), player2(), current_player(), win(), board(), parent(parent)
 {
-    player1 = new Player("Joueur 1", true, 1);
-    player2 = new Player("Joueur 2", true, 2);
+//    player1 = new Player("Joueur 1", true, 1);
+//    player2 = new Player("Joueur 2", true, 2);
 }
 
 
@@ -27,6 +27,14 @@ void Game::run()
         // attend un choix de move du joueur courant
         while (!current_player->hasPlayed())
         {
+            if (current_player->isIA())
+            {
+                static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(false);
+
+                QThread::msleep(1000);
+                int move = this->current_player->getIAMove(this->board);
+                emit playerPlayed(move);
+            }
         }
 
         // joueur courant a choisi son action
@@ -168,6 +176,8 @@ void Game::playerPlayed(int index)
             }
         }
     }
+
+//    static_cast<Router*>(this->parent)->getBoard().repaint();
 }
 
 
@@ -282,7 +292,6 @@ void Game::chooseFirstPlayer()
     // Génération du nombre aléatoire
     srand(time(NULL));
     int random = (rand() % (MAX - MIN + 1)) + MIN;
-    std::cout<<"random = "<<random<<" ";
     if (random > 50 )
     {
         current_player = player1;
@@ -314,23 +323,6 @@ void Game::changeCurrentPlayer()
 }
 
 
-// Gestion de l'IA
-void Game::setMode(int mode)
-{
-    if (mode == 1)
-    {
-        this->player1->setIA(true);
-        this->player2->setIA(true);
-    } else if (mode == 2) {
-        this->player1->setIA(false);
-        this->player2->setIA(true);
-    } else if (mode == 3) {
-        this->player1->setIA(false);
-        this->player2->setIA(false);
-    }
-}
-
-
 
 // -------------------------------------------
 // ----------------- SETTERS -----------------
@@ -351,3 +343,18 @@ void Game::setPlayer2(Player pl)
 
 
 
+// Gestion de l'IA
+void Game::setMode(int mode, int diff)
+{
+    if (mode == 1)
+    {
+        player1 = new IAPlayer("Joueur 1", 1, diff);
+        player2 = new IAPlayer("Joueur 2", 2, diff);
+    } else if (mode == 2) {
+        player1 = new Player("Joueur 1", false, 1);
+        player2 = new IAPlayer("Joueur 2", 2, diff);
+    } else if (mode == 3) {
+        player1 = new Player("Joueur 1", false, 1);
+        player2 = new Player("Joueur 2", false, 2);
+    }
+}

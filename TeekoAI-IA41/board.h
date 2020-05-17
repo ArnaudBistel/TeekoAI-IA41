@@ -103,6 +103,7 @@ private:
     // ------------- FRIENDS -------------
     friend class Game;
     friend class Router;
+    friend class IAPlayer;
 };
 
 #endif // BOARD_H

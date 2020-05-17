@@ -27,7 +27,9 @@ public slots:
     bool isHumanVsIA();
     bool isHumanVsHuman();
 
-
+    bool isEasy();
+    bool isMedium();
+    bool isHard();
     // ------------- SIGNALS -------------
 signals:
     void changeInterface(QString name);

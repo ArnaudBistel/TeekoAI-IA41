@@ -37,6 +37,10 @@ private:
     Player *player2;
     Game *game;
 
+
+    // ------------- METHODS -------------
+    void setGameParameters();
+
     // ------------- FRIENDS -------------
     friend class Board;
 };

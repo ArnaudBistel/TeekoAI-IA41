@@ -2,6 +2,7 @@
 #define GAME_H
 #include <QtWidgets>
 #include "player.h"
+#include "iaplayer.h"
 #include "board.h"
 
 #include <iostream>
@@ -30,9 +31,9 @@ public:
     // ------------- PLAYERS METHODS -------------
     void chooseFirstPlayer();
     void changeCurrentPlayer();
-    void setMode(int);
 
     // ------------- SETTERS -------------
+    void setMode(int, int);
     void setPlayer1(Player pl);
     void setPlayer2(Player pl);
 
