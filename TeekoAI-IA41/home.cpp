@@ -1,5 +1,5 @@
 #include "home.h"
-#include "Router.h"
+#include "router.h"
 
 
 Home::Home(QWidget *parent, QString name):

@@ -1,6 +1,6 @@
 #include "board.h"
 #include <iostream>
-#include "Router.h"
+#include "router.h"
 
 // class qui de vue du plateau
 // envoie à Game les choix de l'utilisateur
