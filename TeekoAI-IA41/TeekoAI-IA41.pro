@@ -22,6 +22,8 @@ SOURCES += \
     home.cpp \
     iaplayer.cpp \
     main.cpp \
+    oldboard.cpp \
+    oldhome.cpp \
     pawn.cpp \
     player.cpp \
     router.cpp
@@ -31,6 +33,8 @@ HEADERS += \
     game.h \
     home.h \
     iaplayer.h \
+    oldboard.h \
+    oldhome.h \
     pawn.h \
     player.h \
     playerpanel.h \

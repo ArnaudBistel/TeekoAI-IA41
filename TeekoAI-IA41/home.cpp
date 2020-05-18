@@ -3,7 +3,36 @@
 
 
 Home::Home(QWidget *parent, QString name):
-    QWidget(parent)
+    QWidget(parent),
+
+    // top layout, contient le titre de l'app
+    title_label("Teeko"),
+    title_layout(),
+
+    // Box de congfiguration du mode de jeu
+    configuration_box(tr("Mode de jeu"), this),
+    configuration_form(),
+    button_ia_vs_ia(this),
+    button_human_vs_ia(this),
+    button_human_vs_human(this),
+
+    // Box de configuration de la difficulté
+    difficulty_box(tr("Force de l'IA"), this),
+    difficulty_form(),
+    button_easy(this),
+    button_medium(this),
+    button_hard(this),
+
+    // quitter / commencer / recommencer
+    buttons_layout(),
+    quit_button("Quitter"),
+    start_button("Démarrer le jeu"),
+    restart_button("Recommencer"),
+
+
+    vertical_layout(),
+    params_layout()
+
 {
     this->setObjectName(name);
 
@@ -22,103 +51,83 @@ Home::Home(QWidget *parent, QString name):
     // -------------------------------------
     // top layout, contient le titre de l'app
     // -------------------------------------
-    title_label = new QLabel("Teeko");
-    title_label->setFont(QFont("Roboto", 20, QFont::Bold, false));
-    title_label->setAlignment(Qt::AlignCenter);
-    title_layout = new QHBoxLayout;
-    title_layout->addWidget(title_label);
+    title_label.setFont(QFont("Roboto", 20, QFont::Bold, false));
+    title_label.setAlignment(Qt::AlignCenter);
+    title_layout.addWidget(&title_label);
 
 
 
     // -------------------------------------
     // Box de congfiguration du mode de jeu
     // -------------------------------------
-    configuration_box = new QGroupBox(tr("Mode de jeu"), this);
-    configuration_form = new QFormLayout;
     //configuration_form->setVerticalSpacing(15);
-    configuration_form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    configuration_form.setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
-    button_ia_vs_ia = new QRadioButton(this);
-    connect(button_ia_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
+    connect(&button_ia_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
 
-    button_human_vs_ia = new QRadioButton(this);
-    button_human_vs_ia->setChecked(true);
-    connect(button_human_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
+    button_human_vs_ia.setChecked(true);
+    connect(&button_human_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
 
-    button_human_vs_human = new QRadioButton(this);
-    connect(button_human_vs_human, SIGNAL(clicked()), this, SLOT(disableDifficultyChoice()));
+    connect(&button_human_vs_human, SIGNAL(clicked()), this, SLOT(disableDifficultyChoice()));
 
-    configuration_form->addRow("IA vs IA\t\t", button_ia_vs_ia);
-    configuration_form->addRow("Humain vs IA\t\t", button_human_vs_ia);
-    configuration_form->addRow("Humain vs Humain\t\t", button_human_vs_human);
+    configuration_form.addRow("IA vs IA\t\t", &button_ia_vs_ia);
+    configuration_form.addRow("Humain vs IA\t\t", &button_human_vs_ia);
+    configuration_form.addRow("Humain vs Humain\t\t", &button_human_vs_human);
 
-    configuration_box->setLayout(configuration_form);
-    configuration_box->setMaximumSize(QSize((int) window_width , (int) window_height * 0.33));
+    configuration_box.setLayout(&configuration_form);
+    configuration_box.setMaximumSize(QSize((int) window_width , (int) window_height * 0.33));
 
 
     // -------------------------------------
     // Box de configuration de la difficulté
     // -------------------------------------
-    difficulty_box = new QGroupBox(tr("Force de l'IA"), this);
-    difficulty_form = new QFormLayout;
     //configuration_form->setVerticalSpacing(15);
-    difficulty_form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    difficulty_form.setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
-    button_easy = new QRadioButton(this);
-    button_medium = new QRadioButton(this);
-    button_medium ->setChecked(true);
-    button_hard = new QRadioButton(this);
+    button_medium.setChecked(true);
+    difficulty_form.addRow("Facile\t\t", &button_easy);
+    difficulty_form.addRow("Moyen\t\t", &button_medium);
+    difficulty_form.addRow("Difficile\t\t", &button_hard);
 
-    difficulty_form->addRow("Facile\t\t", button_easy);
-    difficulty_form->addRow("Moyen\t\t", button_medium);
-    difficulty_form->addRow("Difficile\t\t", button_hard);
-
-    difficulty_box->setLayout(difficulty_form);
-    difficulty_box->setMaximumSize(QSize((int) window_width , (int) window_height * 0.33));
+    difficulty_box.setLayout(&difficulty_form);
+    difficulty_box.setMaximumSize(QSize((int) window_width , (int) window_height * 0.33));
 
 
     // -------------------------------------
     // layout qui contient les deux box de configuration
     // -------------------------------------
-    params_layout = new QVBoxLayout;
-    params_layout->addWidget(configuration_box);
-    params_layout->insertSpacing(1, screen_height * 1/7);
-    params_layout->addWidget(difficulty_box);
-    params_layout->setAlignment(Qt::AlignHCenter);
+    params_layout.addWidget(&configuration_box);
+    params_layout.insertSpacing(1, screen_height * 1/7);
+    params_layout.addWidget(&difficulty_box);
+    params_layout.setAlignment(Qt::AlignHCenter);
 
 
     // -------------------------------------
     // quitter / commencer / recommencer
     // -------------------------------------
-    buttons_layout = new QHBoxLayout;
+    connect(&quit_button, SIGNAL(clicked()), qApp, SLOT(quit()));
+    buttons_layout.addWidget(&quit_button);
 
-    quit_button= new QPushButton("Quitter");
-    connect(quit_button, SIGNAL(clicked()), qApp, SLOT(quit()));
-    buttons_layout->addWidget(quit_button);
+    buttons_layout.insertSpacing(1, screen_width / 4);
 
-    buttons_layout->insertSpacing(1, screen_width / 4);
+    restart_button.setVisible(false);
+    connect(&restart_button, SIGNAL(clicked()), this->parent(), SLOT(restartGame()));
+    buttons_layout.addWidget(&restart_button);
 
-    restart_button= new QPushButton("Recommencer");
-    restart_button->setVisible(false);
-    connect(restart_button, SIGNAL(clicked()), this->parent(), SLOT(restartGame()));
-    buttons_layout->addWidget(restart_button);
-
-    start_button= new QPushButton("Démarrer le jeu");
-    connect(start_button, SIGNAL(clicked()), this, SLOT(launch_game()));
-    buttons_layout->addWidget(start_button);
+    connect(&start_button, SIGNAL(clicked()), this, SLOT(launch_game()));
+    buttons_layout.addWidget(&start_button);
 
 
     // -------------------------------------
     // vertical et horizontal layouts qui contiennent tous les widgets de Home
     // -------------------------------------
-    vertical_layout = new QVBoxLayout();
-    vertical_layout->addLayout(title_layout);
+    vertical_layout.addLayout(&title_layout);
     //vertical_layout->insertSpacing(1, screen_height * 1/7);
-    vertical_layout->addLayout(params_layout);
-    vertical_layout->insertSpacing(3, screen_height * 1/7);
-    vertical_layout->addLayout(buttons_layout);
+    vertical_layout.addLayout(&params_layout);
+    vertical_layout.insertSpacing(3, screen_height * 1/7);
+    vertical_layout.addLayout(&buttons_layout);
 
-    this->setLayout(vertical_layout);
+    this->setLayout(&vertical_layout);
 }
 
 
@@ -128,8 +137,8 @@ void Home::launch_game()
 {
     emit changeInterface("board");
     // les boutons de la page d'accueil évolue une fois le jeu lancé une première fois
-    this->start_button->setText("Continuer");
-    this->restart_button->setVisible(true);
+    this->start_button.setText("Continuer");
+    this->restart_button.setVisible(true);
 }
 
 
@@ -138,9 +147,9 @@ void Home::launch_game()
 // on peut modifier sa force
 void Home::enableDifficultyChoice()
 {
-    this->button_easy->setEnabled(true);
-    this->button_medium->setEnabled(true);
-    this->button_hard->setEnabled(true);
+    this->button_easy.setEnabled(true);
+    this->button_medium.setEnabled(true);
+    this->button_hard.setEnabled(true);
 }
 
 
@@ -148,44 +157,44 @@ void Home::enableDifficultyChoice()
 // on ne peut pas modifier sa force
 void Home::disableDifficultyChoice()
 {
-    this->button_easy->setEnabled(false);
-    this->button_medium->setEnabled(false);
-    this->button_hard->setEnabled(false);
+    this->button_easy.setEnabled(false);
+    this->button_medium.setEnabled(false);
+    this->button_hard.setEnabled(false);
 }
 
 
 bool Home::isIAVsIA()
 {
-    return this->button_ia_vs_ia->isChecked();
+    return this->button_ia_vs_ia.isChecked();
 }
 
 
 bool Home::isHumanVsIA()
 {
-    return this->button_human_vs_ia->isChecked();
+    return this->button_human_vs_ia.isChecked();
 }
 
 
 bool Home::isHumanVsHuman()
 {
-    return this->button_human_vs_human->isChecked();
+    return this->button_human_vs_human.isChecked();
 }
 
 bool Home::isEasy()
 {
-    return this->button_easy->isChecked();
+    return this->button_easy.isChecked();
 }
 
 
 bool Home::isMedium()
 {
-    return this->button_medium->isChecked();
+    return this->button_medium.isChecked();
 }
 
 
 bool Home::isHard()
 {
-    return this->button_hard->isChecked();
+    return this->button_hard.isChecked();
 }
 
 

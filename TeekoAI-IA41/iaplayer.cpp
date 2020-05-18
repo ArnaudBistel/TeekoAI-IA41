@@ -60,6 +60,12 @@ void IAPlayer::findMove(int  board [5][5])
             // Génération du nombre aléatoire
             srand(time(NULL));
             move = (rand() % (MAX - MIN + 1)) + MIN;
+
+            while (board[(int) move / 5][move % 5] != 0)
+            {
+                move = (rand() % (MAX - MIN + 1)) + MIN;
+            }
+
             std::cout << "move : " << move << std::endl;
         }
 //    }

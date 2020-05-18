@@ -43,12 +43,16 @@ void Router::restartGame()
         // affiche la page de jeu
         this->setCurrentWidget(board);
 
-        // démarre le threzad du jeu
+        // démarre le thread du jeu
         game->start();
     }
-
 }
 
+
+void Router::pauseGame()
+{
+    this->game->setPause(true);
+}
 
 
 //Controlleur : slot pour changer de page
@@ -59,16 +63,23 @@ void Router::changeOnglet(QString name)
     if((name == home->objectName()) && home)
     {
         this->setCurrentWidget(home);
+        this->board->setBoardLabelEnabled(true);
         return;
     }
 
     // Board, page du jeu
     else if((name == board->objectName()) && board)
     {
-        this->setGameParameters();
-
-        // lance le thread de jeu
-        game->start();
+        if (game->isPaused())
+        {
+            game->setPause(false);
+        } else
+        {
+            this->setGameParameters();
+            game->setPause(false);
+            // lance le thread de jeu
+            game->start();
+        }
         // affiche la page de jeu
         this->setCurrentWidget(board);
         return;

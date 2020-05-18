@@ -4,10 +4,8 @@
 // Classe qui contient la logique du jeu.
 
 // CONSTRUCTOR
-Game::Game(QWidget *parent) : player1(), player2(), current_player(), win(), board(), parent(parent)
+Game::Game(QWidget *parent) : player1(), player2(), current_player(), win(), board(), parent(parent), pause()
 {
-//    player1 = new Player("Joueur 1", true, 1);
-//    player2 = new Player("Joueur 2", true, 2);
 }
 
 
@@ -31,7 +29,7 @@ void Game::run()
             {
                 static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(false);
 
-                QThread::msleep(1000);
+                QThread::msleep(500);
                 int move = this->current_player->getIAMove(this->board);
                 emit playerPlayed(move);
             }
@@ -63,6 +61,11 @@ void Game::run()
             }
         }
 
+        while (this->isPaused())
+        {
+            QThread::msleep(1000);
+        }
+
     }
 }
 
@@ -75,6 +78,7 @@ void Game::restartGame()
 
     // reset des attributs de Game
     this->win = false;
+    this->pause = false;
     for(int i=0; i<5; i++)
     {
         for(int j=0; j<5; j++)
@@ -112,6 +116,9 @@ bool Game::checkIfWins(int id)
     if (win)
         return win;
     win = this->checkSquare(id);
+    if (win)
+        return win;
+    win = this->checkDiag(id);
     if (win)
         return win;
 
@@ -251,30 +258,56 @@ bool Game::checkCol(int id)
 
 bool Game::checkSquare(int id)
 {
-    bool win;
-
     for(int i=0;i<4;i++)
     {
 
         for(int j=0;j<4;j++)
         {
-            if(board[i][j]       ==  id &&\
-               board[i][j+1]     ==  id &&\
-               board[i+1][j]     ==  id &&\
+            if(board[i][j]       ==  id &&
+               board[i][j+1]     ==  id &&
+               board[i+1][j]     ==  id &&
                board[i+1][j+1]   ==  id)
             {
-                win = true;
+                return true;
             }
         }
     }
-    return win;
+    return false;
 }
 
 
 
-pointer_to_arrays Game::getBoard()
+bool Game::checkDiag(int id)
 {
-    return this->board;
+    for (int i = 0 ; i < 2; i++ )
+    {
+        for (int j = 0 ; j < 2; j++ )
+        {
+            if(board[i][j]       ==  id &&
+               board[i+1][j+1]   ==  id &&
+               board[i+2][j+2]   ==  id &&
+               board[i+3][j+3]   ==  id)
+            {
+                return true;
+            }
+        }
+    }
+
+    for (int i = 0 ; i < 2; i++ )
+    {
+        for (int j = 3 ; j < 5; j++ )
+        {
+            if(board[i][j]       ==  id &&
+               board[i+1][j-1]   ==  id &&
+               board[i+2][j-2]   ==  id &&
+               board[i+3][j-3]   ==  id)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 
@@ -359,6 +392,26 @@ void Game::setMode(int mode, int diff)
     }
 }
 
+void Game::setPause(bool b)
+{
+    this->pause = b;
+}
 
 
 
+
+
+// -------------------------------------------
+// ----------------- GETTERS -----------------
+// -------------------------------------------
+
+pointer_to_arrays Game::getBoard()
+{
+    return this->board;
+}
+
+
+bool Game::isPaused()
+{
+    return this->pause;
+}

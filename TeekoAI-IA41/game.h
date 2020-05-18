@@ -26,6 +26,7 @@ public:
     bool checkRows(int);
     bool checkCol(int);
     bool checkSquare(int);
+    bool checkDiag(int);
     void printBoard();
 
     // ------------- PLAYERS METHODS -------------
@@ -36,10 +37,12 @@ public:
     void setMode(int, int);
     void setPlayer1(Player pl);
     void setPlayer2(Player pl);
+    void setPause(bool);
 
     // ------------- GETTERS -------------
     Board& getBoardObject();
     pointer_to_arrays getBoard();
+    bool isPaused();
 
 public slots:
     void playerPlayed(int);
@@ -52,6 +55,7 @@ private:
     bool win;
     int  board [5][5];
     QWidget *parent;
+    bool pause;
 
 };
 

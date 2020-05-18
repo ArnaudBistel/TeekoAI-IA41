@@ -28,6 +28,7 @@ public:
 public slots:
     void changeOnglet(QString name);
     void restartGame();
+    void pauseGame();
 
 private:
     // ------------- ATTRIBUTES -------------

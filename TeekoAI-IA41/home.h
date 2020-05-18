@@ -42,45 +42,45 @@ private:
     // -------------------------------------
     // top layout, contient le titre de l'app
     // -------------------------------------
-    QLabel *title_label;
-    QHBoxLayout *title_layout;
+    QLabel title_label;
+    QHBoxLayout title_layout;
 
 
     // -------------------------------------
     // Box de congfiguration du mode de jeu
     // -------------------------------------
-    QGroupBox *configuration_box;
-    QFormLayout *configuration_form;
-    QRadioButton *button_human_vs_human;
-    QRadioButton *button_human_vs_ia;
-    QRadioButton *button_ia_vs_ia;
+    QGroupBox configuration_box;
+    QFormLayout configuration_form;
+    QRadioButton button_ia_vs_ia;
+    QRadioButton button_human_vs_ia;
+    QRadioButton button_human_vs_human;
 
 
     // -------------------------------------
     // Box de configuration de la difficulté
     // -------------------------------------
-    QGroupBox *difficulty_box;
-    QFormLayout *difficulty_form;
-    QRadioButton *button_easy;
-    QRadioButton *button_medium;
-    QRadioButton *button_hard;
+    QGroupBox difficulty_box;
+    QFormLayout difficulty_form;
+    QRadioButton button_easy;
+    QRadioButton button_medium;
+    QRadioButton button_hard;
 
 
     // -------------------------------------
     // quitter / commencer / recommencer
     // -------------------------------------
-    QHBoxLayout *buttons_layout;
-    QPushButton *quit_button;
-    QPushButton *start_button;
-    QPushButton *restart_button;
+    QHBoxLayout buttons_layout;
+    QPushButton quit_button;
+    QPushButton start_button;
+    QPushButton restart_button;
 
 
     // -------------------------------------
     // vertical et horizontal layouts qui contiennent tous les widgets de Home
     // -------------------------------------
-    QVBoxLayout *vertical_layout;
-    QVBoxLayout *params_layout;
-    QHBoxLayout *horizontal_layout;
+    QVBoxLayout vertical_layout;
+    QVBoxLayout params_layout;
+//    QHBoxLayout horizontal_layout;
 
 };
 

@@ -14,6 +14,7 @@ public:
     // ------------- GETTERS -------------
     int getIndex();
     bool isSelectable();
+    bool getSelected();
 
     // ------------- SLOTS -------------
 public slots:

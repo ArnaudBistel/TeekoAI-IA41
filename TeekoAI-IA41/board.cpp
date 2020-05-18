@@ -9,25 +9,49 @@ Board::Board()
 
 
 Board::Board(QWidget *parent, QString name):
-    QWidget(parent), board()
+    // Fenêtre du jeu
+    QWidget(parent), board(),
+    board_label(this),
+    but_and_image_layout(),
+    win_label("", &board_label),
+
+    // Panneau affichant les joueurs
+    panel_layout (),
+    player1_layout(),
+    player1_groupbox("", this),
+    player1_name_label("Joueur 1"),
+    player1_type_label(""),
+    player1_color_label(),
+    player2_groupbox("", this),
+    player2_layout(),
+    player2_name_label("Joueur 2"),
+    player2_type_label(""),
+    player2_color_label(),
+
+    // retour et recommencer
+    bottom_buttons_layout(),
+    back_to_home_button("Retour", this),
+    reset_button("Recommencer"),
+
+    // vertical  et horizontal layout qui contiennent tous les widgets
+    v_layout(),
+    h_layout()
 {
 
-//    for(int i=0; i<5; i++)
-//    {
-//            for(int j=0; j<5; j++)
-//            {
-//                    std::cout<<" "<<board[i][j]<<" ";
-//            }
-//            std::cout<<"\n";
-//    }
-
     this->setObjectName(name);
+
     // pour la transition entre les pages via MainWindow
     connect(this,SIGNAL(changeInterface(QString)), this->parent(),SLOT(changeOnglet(QString)));
+
     // lors de l'appuie sur Recommencer
     connect(this, SIGNAL(beginGame()), this->parent(), SLOT(restartGame()));
+
+    // lors de l'appuie sur Accueil
+    connect(this, SIGNAL(holdOn()), this->parent(), SLOT(pauseGame()));
+
     // envoi du signal que le joueur a fait son choix
     connect(this,SIGNAL(playerPlayed(int)),  static_cast<Router*>(this->parent())->game,SLOT(playerPlayed(int)));
+
 
     // ******************************************
     // ********* Création de le la vue **********
@@ -46,25 +70,24 @@ Board::Board(QWidget *parent, QString name):
     double board_size = screen_height * 3/4;
 
     // label contenant le plateau
-    board_label = new QLabel(this);
-    board_label->setFixedSize(board_size, board_size);
+    board_label.setFixedSize(board_size, board_size);
 //    QPixmap board_image("./res/teeko_board_v.png");
     QPixmap board_image("../res/teeko_board_v.png");
-    board_label->setPixmap(board_image);
-    board_label->setScaledContents( true );
+    board_label.setPixmap(board_image);
+    board_label.setScaledContents( true );
 
 
     // -------------- Pions ---------------
     // mise en place des bouttons/Pions
     // les pions sont des QPushButtons dérivés
     int index = 0;
-    int y = board_label->height()/33;
-    int x = board_label->height()/32.4;
-    int height = board_label->height() / 8.1;
+    int y = board_label.height()/33;
+    int x = board_label.height()/32.4;
+    int height = board_label.height() / 8.1;
 
     for(int i = 0;i<5;i++){
         for(int j = 0;j<5;j++){
-            Pawn *pawn = new Pawn("", board_label);
+            Pawn *pawn = new Pawn("", &board_label);
             connect(pawn, SIGNAL(clicked()), this, SLOT(tileChosen()));
             pawn->setGeometry(x, y, height , height);
 
@@ -73,112 +96,101 @@ Board::Board(QWidget *parent, QString name):
             pawn->setIndex(index);
             index++;
 
-            x += board_label->height()/4.90;
+            x += board_label.height()/4.90;
         }
-        x = board_label->height()/32.4;
-        y += board_label->height()/4.89;
+        x = board_label.height()/32.4;
+        y += board_label.height()/4.89;
     }
 
 
     // --------- Label de victoire ---------
-    win_label = new QLabel("", board_label);
-    win_label->setAlignment(Qt::AlignCenter);
-    win_label->setFont(QFont("Comic Sans MS", 18, QFont::Bold, false));
-    win_label->setStyleSheet("QLabel {margin-left: 10px; background:white; border-radius: 25px; border: 2px solid black; color: black;}");
-    win_label->setVisible(false);
+    win_label.setAlignment(Qt::AlignCenter);
+    win_label.setFont(QFont("Comic Sans MS", 18, QFont::Bold, false));
+    win_label.setStyleSheet("QLabel {margin-left: 10px; background:white; border-radius: 25px; border: 2px solid black; color: black;}");
+    win_label.setVisible(false);
 
     // layout qui permet la superposition du plateau et du label de victoire
-    but_and_image_layout = new QGridLayout;
-    but_and_image_layout->addWidget(board_label,0,0);
-    but_and_image_layout->addWidget(win_label,0,0);
+    but_and_image_layout.addWidget(&board_label,0,0);
+    but_and_image_layout.addWidget(&win_label,0,0);
 
 
 
     // ----------------------------------
     // Panneau affichant les données sur les joueurs
     // ----------------------------------
-    panel_layout = new QVBoxLayout;
-    panel_layout->insertSpacing(0, screen_height * 1/7);
+    panel_layout.insertSpacing(0, screen_height * 1/7);
 
     // --------- GroupBox du Joueur 1 ---------
-    player1_groupbox = new QGroupBox("", this);
-    player1_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
-    player1_layout = new QVBoxLayout;
+    player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
 
-    player1_name_label = new QLabel("Joueur 1");
-    player1_name_label->setFont(QFont("Comic Sans MS", 15));
-    player1_name_label->setAlignment(Qt::AlignHCenter);
-    player1_type_label = new QLabel("");
-    player1_type_label->setFont(QFont("Comic Sans MS", 12));
-    player1_type_label->setAlignment(Qt::AlignHCenter);
-    player1_color_label = new QLabel;
-    player1_color_label->setAlignment(Qt::AlignHCenter);
+
+    player1_name_label.setFont(QFont("Comic Sans MS", 15));
+    player1_name_label.setAlignment(Qt::AlignHCenter);
+
+    player1_type_label.setFont(QFont("Comic Sans MS", 12));
+    player1_type_label.setAlignment(Qt::AlignHCenter);
+
+    player1_color_label.setAlignment(Qt::AlignHCenter);
 //    QPixmap pix("./res/blue_pawn.png");
     QPixmap pix("../res/blue_pawn.png");
-    player1_color_label->setPixmap(pix.scaled((board_label->height() / 8.1) - 10 , (board_label->height() / 8.1) -10 ,Qt::KeepAspectRatio));
+    player1_color_label.setPixmap(pix.scaled((board_label.height() / 8.1) - 10 , (board_label.height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
-    player1_layout->addWidget(player1_name_label);
-    player1_layout->addWidget(player1_type_label);
-    player1_layout->addWidget(player1_color_label);
-    player1_groupbox->setLayout(player1_layout);
-    panel_layout->addWidget(player1_groupbox);
+    player1_layout.addWidget(&player1_name_label);
+    player1_layout.addWidget(&player1_type_label);
+    player1_layout.addWidget(&player1_color_label);
+    player1_groupbox.setLayout(&player1_layout);
+    panel_layout.addWidget(&player1_groupbox);
 
 
-    panel_layout->insertSpacing(2, screen_height * 1/7);
+    panel_layout.insertSpacing(2, screen_height * 1/7);
 
     // --------- GroupBox du Joueur 2 ---------
-    player2_groupbox = new QGroupBox("", this);
-    player2_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
-    player2_layout = new QVBoxLayout;
 
-    player2_name_label = new QLabel("Joueur 2");
-    player2_name_label->setFont(QFont("Comic Sans MS", 15));
-    player2_name_label->setAlignment(Qt::AlignHCenter);
-    player2_type_label = new QLabel("");
-    player2_type_label->setFont(QFont("Comic Sans MS", 12));
-    player2_type_label->setAlignment(Qt::AlignHCenter);
-    player2_color_label = new QLabel;
-    player2_color_label->setAlignment(Qt::AlignHCenter);
+    player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
+
+
+
+    player2_name_label.setFont(QFont("Comic Sans MS", 15));
+    player2_name_label.setAlignment(Qt::AlignHCenter);
+    player2_type_label.setFont(QFont("Comic Sans MS", 12));
+    player2_type_label.setAlignment(Qt::AlignHCenter);
+    player2_color_label.setAlignment(Qt::AlignHCenter);
 //    QPixmap pix2("./res/red_pawn.png");
     QPixmap pix2("../res/red_pawn.png");
-    player2_color_label->setPixmap(pix2.scaled((board_label->height() / 8.1) - 10 , (board_label->height() / 8.1) -10 ,Qt::KeepAspectRatio));
+    player2_color_label.setPixmap(pix2.scaled((board_label.height() / 8.1) - 10 , (board_label.height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
-    player2_layout->addWidget(player2_name_label);
-    player2_layout->addWidget(player2_type_label);
-    player2_layout->addWidget(player2_color_label);
-    player2_groupbox->setLayout(player2_layout);
-    panel_layout->addWidget(player2_groupbox);
+    player2_layout.addWidget(&player2_name_label);
+    player2_layout.addWidget(&player2_type_label);
+    player2_layout.addWidget(&player2_color_label);
+    player2_groupbox.setLayout(&player2_layout);
+    panel_layout.addWidget(&player2_groupbox);
 
-    panel_layout->insertSpacing(4, screen_height * 1/7);
+    panel_layout.insertSpacing(4, screen_height * 1/7);
 
 
 
     // ----------------------------------
     // Boutons retour et recommencer
     // ----------------------------------
-    bottom_buttons_layout = new QHBoxLayout;
-    back_to_home_button = new QPushButton ("Retour", this);
-    connect(back_to_home_button, SIGNAL(clicked()), this, SLOT(goBack()));
-    bottom_buttons_layout->addWidget(back_to_home_button);
 
-    bottom_buttons_layout->insertSpacing(1, screen_width / 3);
+    connect(&back_to_home_button, SIGNAL(clicked()), this, SLOT(goBack()));
+    bottom_buttons_layout.addWidget(&back_to_home_button);
 
-    reset_button = new QPushButton("Recommencer");
-    connect(reset_button, SIGNAL(clicked()), this, SLOT(resetGame()));
-    bottom_buttons_layout->addWidget(reset_button);
+    bottom_buttons_layout.insertSpacing(1, screen_width / 3);
+
+    connect(&reset_button, SIGNAL(clicked()), this, SLOT(resetGame()));
+    bottom_buttons_layout.addWidget(&reset_button);
 
 
     // -------------------------------------
     // vertical et horizontal layout qui contiennent tous les widget de la page
     // -------------------------------------
-    v_layout= new QVBoxLayout;
-    v_layout->addLayout(but_and_image_layout);
-    v_layout->addLayout(bottom_buttons_layout);
+    v_layout.addLayout(&but_and_image_layout);
+    v_layout.addLayout(&bottom_buttons_layout);
 
-    h_layout = new QHBoxLayout;
-    h_layout->addLayout(v_layout);
-    h_layout->addLayout(panel_layout);
-    this->setLayout(h_layout);
+    h_layout.addLayout(&v_layout);
+    h_layout.addLayout(&panel_layout);
+    this->setLayout(&h_layout);
 }
 
 
@@ -224,7 +236,7 @@ void Board::displayPossibleMoves(int line, int col)
 {
     this->enableBoard();
 
-    // permet de déselctionner le pion sélectionné
+    // permet de déselectionner le pion sélectionné
     this->array[line][col]->setEnabled(true);
 
     // évaluation des choix possibles
@@ -301,7 +313,7 @@ void Board::displayPossibleMoves(int line, int col)
         }
     }
 
-    board_label->setEnabled(true);
+    board_label.setEnabled(true);
 }
 
 
@@ -332,7 +344,7 @@ void Board::deletePossibleMoves()
 // bloque le plateau momentanément
 void Board::setBoardLabelEnabled(bool b)
 {
-    this->board_label->setEnabled(b);
+    this->board_label.setEnabled(b);
 }
 
 
@@ -342,7 +354,7 @@ void Board::setBoardLabelEnabled(bool b)
 // dans case adjacente
 void Board::prepareBoardForCurrentPlayer(int id, int pion_played)
 {
-    board_label->setEnabled(true);
+    board_label.setEnabled(true);
 
     // moins de 4 pions joués donc joueur place son jeton
     // toutes les cases sur lesquelles aucun jeton n'est placé sont valides
@@ -428,16 +440,25 @@ void Board::initBoardInvisible()
 // réinitialise le board en cas d'appuie sur Recommencer
 void Board::reinit()
 {
-    win_label->setVisible(false);
-    board_label->setEnabled(false);
+    win_label.setVisible(false);
+    board_label.setEnabled(false);
     int index = 0;
     for(int i=0; i<5; i++)
     {
         for(int j=0; j<5; j++)
         {
             board[i][j] = 0;
+            array[i][j]->setEnabled(true);
             array[i][j]->setSelectable(false);
-            array[i][j]->isSelected(false, true);
+            // un pion avait été sélectionné pour être déplacé au moment où
+            // la partie a été recommencée
+            if(array[i][j]->getSelected())
+            {
+                array[i][j]->isSelected(false, false);
+            // les autres pions non sélecitonnés à ce moment
+            } else {
+                array[i][j]->isSelected(false, true);
+            }
             array[i][j]->setColor(0);
             array[i][j]->setPlayer(0);
             array[i][j]->setIndex(index);
@@ -459,13 +480,13 @@ void Board::displayCurrentPlayer(int player)
 {
     if (player == 1 )
     {
-        this->player1_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid blue;}");
-        this->player2_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
+        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid blue;}");
+        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
 
     } else if (player == 2)
     {
-        this->player2_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid red;}");
-        this->player1_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
+        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid red;}");
+        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
     }
 }
 
@@ -474,8 +495,8 @@ void Board::displayCurrentPlayer(int player)
 // met le type du joueur (IA ou HUMAIN)
 void Board::displayPlayers(QString player1, QString player2)
 {
-    this->player1_type_label->setText(player1);
-    this->player2_type_label->setText(player2);
+    this->player1_type_label.setText(player1);
+    this->player2_type_label.setText(player2);
 }
 
 
@@ -486,14 +507,14 @@ void Board::announceWinner(int id, QString name)
     // entoure en blanc son panel
     if (id == 1)
     {
-        this->player1_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
     } else {
-        this->player2_groupbox->setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
     }
 
     // affiche le label de victoire sur le plateau
-    win_label->setText("Bravo " + name + " vous avez gagné !");
-    win_label->setVisible(true);
+    win_label.setText("Bravo " + name + " vous avez gagné !");
+    win_label.setVisible(true);
 }
 
 
@@ -501,8 +522,8 @@ void Board::announceWinner(int id, QString name)
 // obsolète ?
 void Board::displayWinLabel(QString name)
 {
-    win_label->setText("Bravo " + name + "vous avez gagné !");
-    win_label->setVisible(true);
+    win_label.setText("Bravo " + name + "vous avez gagné !");
+    win_label.setVisible(true);
 }
 
 
@@ -515,7 +536,7 @@ void Board::displayWinLabel(QString name)
 // on envoie un signal réceptionné par Router et Game
 void Board::tileChosen()
 {
-    board_label->setEnabled(false);
+    board_label.setEnabled(false);
     // verrou pour la suynchronization
     QMutexLocker verrou(&mutex);
 
@@ -530,6 +551,8 @@ void Board::tileChosen()
 // Retourner vers l'accueil
 void Board::goBack()
 {
+    board_label.setEnabled(false);
+    emit holdOn();
     emit changeInterface("home");
 }
 

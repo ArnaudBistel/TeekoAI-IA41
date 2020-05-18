@@ -31,6 +31,7 @@ signals:
     void changeInterface(QString name);
     void playerPlayed(int);
     void beginGame();
+    void holdOn();
 
 private:
     // ---------- PAWN & BOARD METHODS ----------
@@ -53,8 +54,8 @@ private:
     void displayWinLabel(QString);
 
 
-
     // ------------- ATTRIBUTES -------------
+    // représentation matricielle du board
     int  board [5][5];
     // synchronization de thread
     QMutex mutex;
@@ -64,40 +65,40 @@ private:
     // ----------------------------------
     // Fenêtre du jeu
     // ----------------------------------
-    QLabel *board_label;
+    QLabel board_label;
     Pawn* array[5][5];
-    QGridLayout *but_and_image_layout;
-    QLabel *win_label;
+    QGridLayout but_and_image_layout;
+    QLabel win_label;
 
 
     // ----------------------------------
     // Panneau affichant les joueurs
     // ----------------------------------
-    QVBoxLayout *panel_layout;
-    QVBoxLayout *player1_layout;
-    QGroupBox *player1_groupbox;
-    QLabel *player1_name_label;
-    QLabel *player1_type_label;
-    QLabel *player1_color_label;
-    QGroupBox *player2_groupbox;
-    QVBoxLayout *player2_layout;
-    QLabel *player2_name_label;
-    QLabel *player2_type_label;
-    QLabel *player2_color_label;
+    QVBoxLayout panel_layout;
+    QVBoxLayout player1_layout;
+    QGroupBox player1_groupbox;
+    QLabel player1_name_label;
+    QLabel player1_type_label;
+    QLabel player1_color_label;
+    QGroupBox player2_groupbox;
+    QVBoxLayout player2_layout;
+    QLabel player2_name_label;
+    QLabel player2_type_label;
+    QLabel player2_color_label;
 
 
     // ----------------------------------
     // retour et recommencer
     // ----------------------------------
-    QHBoxLayout *bottom_buttons_layout;
-    QPushButton *back_to_home_button;
-    QPushButton *reset_button;
+    QHBoxLayout bottom_buttons_layout;
+    QPushButton back_to_home_button;
+    QPushButton reset_button;
 
     // -------------------------------------
-    // vertical layout that contains all the widgets
+    // vertical  et horizontal layout qui contiennent tous les widgets
     // -------------------------------------
-    QVBoxLayout *v_layout;
-    QHBoxLayout *h_layout;
+    QVBoxLayout v_layout;
+    QHBoxLayout h_layout;
 
 
     // ------------- FRIENDS -------------
