@@ -7,7 +7,7 @@
 // ou non sélectionné (blanc)
 
 // constructor
-Pawn::Pawn(const QString &text, QWidget *parent): index(), color(), selected(), QPushButton(text, parent), player(), selectable()
+Pawn::Pawn(const QString &text, QWidget *parent): QPushButton(text, parent), index(), color(), selected(), player(), selectable()
 {
     // de base le pion est blanc (transparent)
     QString str = "background-color: white;";

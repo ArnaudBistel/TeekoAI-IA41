@@ -18,7 +18,6 @@ Home::Home(QWidget *parent, QString name):
     int window_width = parent->width();
     int window_height = parent->height();
 
-
     // -------------------------------------
     // top layout, contient le titre de l'app
     // -------------------------------------

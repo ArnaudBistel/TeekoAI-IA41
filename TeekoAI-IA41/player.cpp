@@ -119,7 +119,7 @@ int Player::getPreviousIndex()
     return this->previous_index;
 }
 
-int Player::getIAMove(int  board [5][5])
+int Player::getIAMove(int board [5][5])
 {
     return -1;
 }

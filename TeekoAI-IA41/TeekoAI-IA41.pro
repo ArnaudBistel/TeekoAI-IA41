@@ -33,7 +33,6 @@ HEADERS += \
     iaplayer.h \
     pawn.h \
     player.h \
-    playerpanel.h \
     router.h
 
 FORMS +=

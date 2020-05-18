@@ -197,7 +197,7 @@ void Board::placePion(int id, int line, int col, bool selected, bool more_than_4
     // pion sélectionné
     if (selected)
     {
-        this->array[line][col]->isSelected(true, false);
+        this->array[line][col]->isSelected(true, false);       //Lorsquon place le premier pion, l'ID du joueur devient l'emplacement du pion
 
     // pion déplacé
     } else if (more_than_4 && !unselected)
@@ -354,9 +354,10 @@ void Board::prepareBoardForCurrentPlayer(int id, int pion_played)
             {
                 if (board[i][j] != 0)
                 {
-                    array[i][j]->setEnabled(false);
-                } else {
-                    array[i][j]->setEnabled(true);
+
+                   array[i][j]->setEnabled(false);         //Desactive les case remplies, une case remplie > 0
+                   } else {
+                   array[i][j]->setEnabled(true);
                 }
             }
         }
