@@ -57,20 +57,15 @@ void IAPlayer::findMove(int  board [5][5])
             move = pawns[move];
 
         } else if (this->pionOnBoard() < 4) {   //Si il y a moins de 4pions sur le plateau, move = case au hasard entre 1 et 25
-            int MAX = 4, MIN = 0;
-            int i,j=0;
-
             // Génération du nombre aléatoire
+            int MAX = 24;
             srand(time(NULL));
-            i = (rand() % (MAX - MIN + 1)) + MIN;
-            j = (rand() % (MAX - MIN + 1)) + MIN;
-            move = i*j;
-            std::cout << "move : " << move << std::endl;
-            while (board[i][j] != 0)
+            move = (rand()%(MAX + 1));
+            std::cout << "Move : " << move << std::endl;
+
+            while (board[(int) move/5][move % 5] != 0)
             {
-                i = (rand() % (MAX - MIN + 1)) + MIN;
-                j = (rand() % (MAX - MIN + 1)) + MIN;
-                move = i*j;
+                move = (rand()% MAX +1);
                 std::cout << "newMove : " << move << std::endl;
             }
         }
