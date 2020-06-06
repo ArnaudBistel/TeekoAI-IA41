@@ -2,7 +2,7 @@
 #define GAME_H
 #include <QtWidgets>
 #include "player.h"
-#include "iaplayer.h"
+#include "aiplayer.h"
 #include "board.h"
 
 #include <iostream>
@@ -51,6 +51,7 @@ public slots:
 private:
 
     // ------------- ATTRIBUTES -------------
+//    Player player1, player2, *current_player;
     Player *player1, *player2, *current_player;
     bool win;
     int  board [5][5];

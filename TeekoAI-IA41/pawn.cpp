@@ -7,7 +7,40 @@
 // ou non sélectionné (blanc)
 
 // constructor
+Pawn::Pawn () : QPushButton(), index(), color(), selected(), player(), selectable()
+{
+    this->initStyle();
+}
+
+Pawn::Pawn(Pawn const & p)
+{
+    this->index = p.index;
+    this->color = p.color;
+    this->selected = p .selected;
+    this->player = p.player;
+    this->selectable = p.selectable;
+    this->initStyle();
+}
+
+Pawn& Pawn::operator= (Pawn const & p)
+{
+    this->index = p.index;
+    this->color = p.color;
+    this->selected = p .selected;
+    this->player = p.player;
+    this->selectable = p.selectable;
+    this->initStyle();
+    return *this;
+}
+
+
 Pawn::Pawn(const QString &text, QWidget *parent): QPushButton(text, parent), index(), color(), selected(), player(), selectable()
+{
+    this->initStyle();
+}
+
+
+void Pawn::initStyle()
 {
     // de base le pion est blanc (transparent)
     QString str = "background-color: white;";
@@ -17,7 +50,6 @@ Pawn::Pawn(const QString &text, QWidget *parent): QPushButton(text, parent), ind
     str+="min-width:100px;";
     str+="min-height:100px;";
     this->setStyleSheet(str);
-
 }
 
 

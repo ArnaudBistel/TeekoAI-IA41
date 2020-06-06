@@ -18,7 +18,7 @@ public:
     // ------------- GETTERS -------------
     pointer_to_arrays getBoard();
     void printBoard();
-
+    bool isOnlyIA();
 
     // ------------- SLOTS -------------
 public slots:
@@ -46,6 +46,7 @@ private:
     void initBoardVisible();
     void initBoardInvisible();
     void reinit();
+    void setOnlyIA(bool);
 
     // ------------- PLAYERS METHODS ------------
     void displayCurrentPlayer(int);
@@ -60,12 +61,14 @@ private:
     // synchronization de thread
     QMutex mutex;
     QWaitCondition sleepSimulator;
-
+    bool onlyIA;
 
     // ----------------------------------
     // Fenêtre du jeu
     // ----------------------------------
     QLabel board_label;
+//    std::vector<std::vector<Pawn*>>array;
+
     Pawn* array[5][5];
     QGridLayout but_and_image_layout;
     QLabel win_label;
@@ -104,7 +107,7 @@ private:
     // ------------- FRIENDS -------------
     friend class Game;
     friend class Router;
-    friend class IAPlayer;
+//    friend class IAPlayer;
 };
 
 #endif // BOARD_H

@@ -13,15 +13,17 @@ Player::Player(QString name, bool ia, int id) : name(name), ia(ia), id(id), play
 Player& Player::operator=(const Player& pl)
 {
     if ( this == &pl)	return *this;
-        this->name 	= pl.name;
-        this->ia    = pl.ia;
-        return *this;
+    this->id = pl.id;
+    this->name 	= pl.name;
+    this->ia    = pl.ia;
+//    std::cout << "dans = " << pl.name << std::endl;
+    return *this;
 }
 
 
 bool Player::operator== (Player &rhs)
 {
-    if (rhs.isIA() == this->isIA() && rhs.getName() == this->getName())
+    if (rhs.isIA() == this->isIA() && rhs.getID() == this->getID() && rhs.getName() == this->getName())
         return true;
     return false;
 }

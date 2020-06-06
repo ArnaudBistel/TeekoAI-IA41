@@ -17,24 +17,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aiplayer.cpp \
     board.cpp \
     game.cpp \
     home.cpp \
-    iaplayer.cpp \
     main.cpp \
-    oldboard.cpp \
-    oldhome.cpp \
     pawn.cpp \
     player.cpp \
     router.cpp
 
 HEADERS += \
+    aiplayer.h \
     board.h \
     game.h \
     home.h \
-    iaplayer.h \
-    oldboard.h \
-    oldhome.h \
     pawn.h \
     player.h \
     playerpanel.h \

@@ -10,7 +10,9 @@ Board::Board()
 
 Board::Board(QWidget *parent, QString name):
     // Fenêtre du jeu
-    QWidget(parent), board(),
+    QWidget(parent),
+    board(),
+    onlyIA(),
     board_label(this),
     but_and_image_layout(),
     win_label("", &board_label),
@@ -86,18 +88,22 @@ Board::Board(QWidget *parent, QString name):
     int height = board_label.height() / 8.1;
 
     for(int i = 0;i<5;i++){
+//        std::vector<Pawn*> row;
         for(int j = 0;j<5;j++){
+
             Pawn *pawn = new Pawn("", &board_label);
             connect(pawn, SIGNAL(clicked()), this, SLOT(tileChosen()));
             pawn->setGeometry(x, y, height , height);
 
             // matrice de boutons/pions
+//            row.push_back(pawn);
             array[i][j] = pawn;
             pawn->setIndex(index);
             index++;
 
             x += board_label.height()/4.90;
         }
+//        array.push_back(row);
         x = board_label.height()/32.4;
         y += board_label.height()/4.89;
     }
@@ -313,7 +319,8 @@ void Board::displayPossibleMoves(int line, int col)
         }
     }
 
-    board_label.setEnabled(true);
+//    if (!onlyIA)
+//        board_label.setEnabled(true);
 }
 
 
@@ -354,7 +361,8 @@ void Board::setBoardLabelEnabled(bool b)
 // dans case adjacente
 void Board::prepareBoardForCurrentPlayer(int id, int pion_played)
 {
-    board_label.setEnabled(true);
+//    if (!onlyIA)
+//        board_label.setEnabled(true);
 
     // moins de 4 pions joués donc joueur place son jeton
     // toutes les cases sur lesquelles aucun jeton n'est placé sont valides
@@ -441,7 +449,7 @@ void Board::initBoardInvisible()
 void Board::reinit()
 {
     win_label.setVisible(false);
-    board_label.setEnabled(false);
+//    board_label.setEnabled(false);
     int index = 0;
     for(int i=0; i<5; i++)
     {
@@ -536,7 +544,9 @@ void Board::displayWinLabel(QString name)
 // on envoie un signal réceptionné par Router et Game
 void Board::tileChosen()
 {
-    board_label.setEnabled(false);
+//    if (!onlyIA)
+//        board_label.setEnabled(false);
+
     // verrou pour la suynchronization
     QMutexLocker verrou(&mutex);
 
@@ -551,7 +561,8 @@ void Board::tileChosen()
 // Retourner vers l'accueil
 void Board::goBack()
 {
-    board_label.setEnabled(false);
+//    if (!onlyIA)
+//        board_label.setEnabled(false);
     emit holdOn();
     emit changeInterface("home");
 }
@@ -571,6 +582,15 @@ void Board::resetGame()
 }
 
 
+
+// ------------------------------------
+// ------------- SETTERS --------------
+// ------------------------------------
+
+void Board::setOnlyIA(bool b)
+{
+    this->onlyIA = b;
+}
 
 
 
@@ -597,4 +617,10 @@ void Board::printBoard()
             std::cout<<"\n";
     }
 
+}
+
+
+bool Board::isOnlyIA()
+{
+    return this->onlyIA;
 }

@@ -63,7 +63,7 @@ void Router::changeOnglet(QString name)
     if((name == home->objectName()) && home)
     {
         this->setCurrentWidget(home);
-        this->board->setBoardLabelEnabled(true);
+//        this->board->setBoardLabelEnabled(true);
         return;
     }
 
@@ -76,7 +76,7 @@ void Router::changeOnglet(QString name)
         } else
         {
             this->setGameParameters();
-            game->setPause(false);
+//            game->setPause(false);
             // lance le thread de jeu
             game->start();
         }
@@ -102,18 +102,23 @@ void Router::setGameParameters()
     {
         mode = 1;
         board->displayPlayers("IA", "IA");
+        board->setOnlyIA(true);
 
     }
     else if (home->isHumanVsIA())
     {
         mode = 2;
         board->displayPlayers("HUMAN", "IA");
+        board->setOnlyIA(false);
+//        board->setBoardLabelEnabled(true);
     }
 
     else if (home->isHumanVsHuman())
     {
         mode = 3;
         board->displayPlayers("HUMAN", "HUMAN");
+        board->setOnlyIA(false);
+//        board->setBoardLabelEnabled(true);
     }
 
     int difficulty = 0;

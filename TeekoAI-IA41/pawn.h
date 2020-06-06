@@ -9,6 +9,9 @@ class Pawn : public QPushButton
     Q_OBJECT
 
 public:
+    Pawn();
+    Pawn(Pawn const &);
+    Pawn & operator = (Pawn const &);
     Pawn(const QString &text, QWidget *parent);
 
     // ------------- GETTERS -------------
@@ -37,6 +40,7 @@ private:
 
     // ------------- METHODS -------------
     void setShadow(int, int);
+    void initStyle();
 
 };
 
