@@ -1,10 +1,8 @@
+aiplayer.o
 board.o
 game.o
 home.o
-iaplayer.o
 main.o
-oldboard.o
-oldhome.o
 pawn.o
 player.o
 router.o

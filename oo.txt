@@ -1,0 +1,10 @@
+Could not parse stylesheet of object QGroupBox(0x63b1538)
+
+
+QBasicTimer::stop: Failed. Possibly trying to stop from a different thread
+
+
+qt.gui.icc: fromIccProfile: failed minimal tag size sanity
+QPngHandler: Failed to parse ICC profile
+qt.gui.icc: fromIccProfile: failed minimal tag size sanity
+QPngHandler: Failed to parse ICC profile
