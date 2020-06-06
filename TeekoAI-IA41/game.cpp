@@ -178,7 +178,7 @@ void Game::playerPlayed(int index)
         // si le joueur a déjà choisi son pion à déplacer
         } else {
 
-            // cas où joueur déselctionne son pion pour en choisir un autre
+            // cas où joueur déselectionne son pion pour en choisir un autre
             if (index == this->current_player->getPreviousIndex())
             {
                 this->current_player->setChosePionToMove(false);

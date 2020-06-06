@@ -29,8 +29,9 @@ private:
     vector<int> computePossibleMoves(int index, int  board [5][5]);
     vector<int> computeSquaresAroundSquare(int index, int  board [5][5]);
 
-    int Minimax(int  board [5][5], int depth, bool is_maximizing, int alpha, int beta);
-
+    int minMax(int  board [5][5], int depth, bool is_maximizing, int alpha, int beta);
+    int checkWin(vector <int>);
+    int evaluateBoard(int[5][5]);
     void copyBoard(int  board [5][5], int new_board [5][5]);
 
     void printBoard(int b [5][5]);

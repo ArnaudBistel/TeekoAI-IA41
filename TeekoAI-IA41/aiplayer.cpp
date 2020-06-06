@@ -66,8 +66,8 @@ void AIPlayer::findMove(int  board [5][5])
     }
 
     // Difficulté facile
-//    if (this->difficulty == 1 )
-//    {
+    if (this->difficulty == 1 )
+    {
         // si l'IA a déjà placé ses 4 pions et qu'elle n'a pas encore choisi
         // quel pion elle va déplacer
         if (this->pionOnBoard() >= 4 && !this->chosePionToMove()) {
@@ -111,12 +111,104 @@ void AIPlayer::findMove(int  board [5][5])
 
 //            std::cout << "move : " << move << std::endl;
         }
-//    }
+    }
+    else{
+        if (this->pionOnBoard()>=4){
+
+        }
+        else{
+            int bestValue, moveValue, bestIndex;
+
+            bestValue = INT32_MAX;
+
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == 0){
+                        int new_board[5][5];
+                        this->copyBoard(board,new_board);
+                        new_board[i][j] = this->getID();
+                        moveValue = minMax(new_board,(this->difficulty) * 2, false,INT32_MIN,INT32_MAX);
+
+                        if(moveValue > bestValue){
+                            bestValue = moveValue;
+                            bestIndex = i*5 + j;
+                        }
+                    }
+                }
+            }
+
+            move = bestIndex;
+
+        }
+    }
 
     this->move = move;
 }
 
 
+int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, int beta){
+
+    vector <int> player1, player2;
+
+    for(int i = 0 ; i<5 ; i++){
+        for (int j = 0 ; j<5 ; j++){
+            if(board[i][j] == 1){
+                player1.push_back(i*5  + j);
+            }
+            else if (board[i][j] == 2){
+                player2.push_back(i*5+j);
+            }
+        }
+    }
+
+    if(depth == 0 || checkWin(player1) == 1 || checkWin(player2) == 1){
+        return evaluateBoard(board);
+    }
+}
+
+
+int AIPlayer::checkWin(vector <int> pawns ){
+    int won, lineCount = 1, columnCount = 1, diag_rCount = 1, diag_lCount = 1, squareCount = 1;
+    int pawn = pawns[0];
+    if(pawns.size() < 4){
+        won = 0;
+    }
+    else{
+        for(int i = 1 ; i<4 ; i++ ){
+            if (pawns[i] == pawn + 1 && pawns[2] == pawns[0] + 5 && pawns[0] % 5 < 4 && pawns[0] < 20){
+                if(i == 2){
+                    pawn = pawns[i];
+                }
+                else{
+                    pawn +=4;
+                }
+                squareCount++;
+            }
+            else if(pawns[i] == pawn +1 && pawns[0]%5 <2){
+                pawn = pawns[i];
+                lineCount++;
+            }
+            else if (pawns[i] == pawn +5 && pawns[0] < 10){
+                pawn = pawns[i];
+                columnCount++;
+            }
+            else if(pawns[i] == pawn + 6 && pawns[0] % 5 < 2 && pawns[0] <7){
+                pawn = pawns[i];
+                diag_rCount++;
+            }
+            else if (pawns[i] == pawn + 4 && pawns[0] % 5 > 2 && pawns[0] < 10){
+                pawn = pawns[i];
+                diag_lCount++;
+            }
+
+        }
+        if(lineCount == 4 || columnCount == 4 || diag_lCount == 4 || diag_rCount == 4 || squareCount == 4)
+            won = 1;
+        else
+            won = 0;
+    }
+    return won;
+}
 
 // retourne un vecteur contenant les index des déplacements possibles pour le
 // pion dont l'index est passé en paramètre
@@ -343,13 +435,6 @@ std::vector<int> AIPlayer::computeSquaresAroundSquare(int index, int  board [5][
     }
 
     return pawns;
-}
-
-
-
-
-int AIPlayer::Minimax(int  board [5][5], int depth, bool is_maximizing, int alpha, int beta) {
-
 }
 
 
