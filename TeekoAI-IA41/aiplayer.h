@@ -3,7 +3,8 @@
 
 #include <QtWidgets>
 #include <iostream>
-
+#include <algorithm>
+#include <cmath>
 #include "player.h"
 
 using namespace std;
@@ -31,7 +32,17 @@ private:
 
     int minMax(int  board [5][5], int depth, bool is_maximizing, int alpha, int beta);
     int checkWin(vector <int>);
+    int checkPawnAlign(vector <int>);
+    int checkPawnDistance(vector <int>);
+    int checkPawnPotential(vector <int>);
     int evaluateBoard(int[5][5]);
+
+    bool isValidSquare(vector<int>);
+    bool isValidLine(vector<int>);
+    bool isValidColumn(vector<int>);
+    bool isValidDiag(vector<int>, bool);
+
+    void createSubSequences(vector <vector <int>>&, vector <int>);
     void copyBoard(int  board [5][5], int new_board [5][5]);
 
     void printBoard(int b [5][5]);
