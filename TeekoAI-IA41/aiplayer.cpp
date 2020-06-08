@@ -113,14 +113,33 @@ void AIPlayer::findMove(int  board [5][5])
         }
     }
     else{
-        if (this->pionOnBoard()>=4){
+        int bestValue, moveValue, bestIndex;
+        bestValue = INT32_MIN;
 
+        if (this->pionOnBoard()>=4){
+            int bestPrevious;
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == this->getID()){
+                        for (int index : computePossibleMoves(i*5 + j, board)){
+                            int new_board[5][5];
+                            this->copyBoard(board,new_board);
+                            new_board[i][j] = 0;
+                            new_board[index/5][index%4] = this->getID();
+                            moveValue = minMax(new_board,(this->difficulty) * 2, false,INT32_MIN,INT32_MAX);
+                            if(moveValue > bestValue){
+                                bestValue = moveValue;
+                                bestIndex = index;
+                                bestPrevious = i*5 + j;
+                            }
+                        }
+                    }
+                }
+            }
+            this->setChosePionToMove(true);
+            this->setPreviousIndex(bestPrevious);
         }
         else{
-            int bestValue, moveValue, bestIndex;
-
-            bestValue = INT32_MAX;
-
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
                     if (board[i][j] == 0){
@@ -136,10 +155,8 @@ void AIPlayer::findMove(int  board [5][5])
                     }
                 }
             }
-
-            move = bestIndex;
-
         }
+        move = bestIndex;
     }
 
     this->move = move;
@@ -164,6 +181,83 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
     if(depth == 0 || checkWin(ai) == 1 || checkWin(player) == 1){
         return evaluateBoard(board);
     }
+
+    if(is_maximizing){
+        int bestValue = INT32_MIN;
+        if(player.size() < 4){
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == 0){
+                        int new_board[5][5];
+                        this->copyBoard(board,new_board);
+                        new_board[i][j] = this->getID();
+                        bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
+                        alpha = max(alpha,bestValue);
+                        if(alpha >= beta)
+                            break;
+
+                    }
+                }
+            }
+        }
+        else{
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == this->getID()){
+                        for (int index : computePossibleMoves(i*5 + j, board)){
+                            int new_board[5][5];
+                            this->copyBoard(board,new_board);
+                            new_board[i][j] = 0;
+                            new_board[index/5][index%4] = this->getID();
+                            bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
+                            alpha = max(alpha,bestValue);
+                            if(alpha >= beta)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else{
+        int bestValue = INT32_MAX;
+        int playerID = ((this->getID() == 1) ? 2 : 1);
+        if(ai.size() < 4){
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == 0){
+                        int new_board[5][5];
+                        this->copyBoard(board,new_board);
+                        new_board[i][j] = playerID;
+                        bestValue = min(bestValue,minMax(new_board,depth-1, true,alpha,beta));
+                        beta = min(beta,bestValue);
+                        if(alpha >= beta)
+                            break;
+
+                    }
+                }
+            }
+        }
+        else{
+            for(int i = 0 ; i<5 ; i++){
+                for(int j =0; j < 5 ; j++){
+                    if (board[i][j] == playerID){
+                        for (int index : computePossibleMoves(i*5 + j, board)){
+                            int new_board[5][5];
+                            this->copyBoard(board,new_board);
+                            new_board[i][j] = 0;
+                            new_board[index/5][index%4] = playerID;
+                            bestValue = min(bestValue,minMax(new_board,depth-1, true,alpha,beta));
+                            beta = min(beta,bestValue);
+                            if(alpha >= beta)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 }
 
 
@@ -186,12 +280,12 @@ int AIPlayer::evaluateBoard(int board[5][5]){
     switch(this->getDifficulty()){
         case 2:
             value = 25*(checkWin(ai) - checkWin(player));
-            value += 0.4*(checkPawnAlign(ai) - checkPawnAlign(player));
+            value += 0.25*(checkPawnAlign(ai) - checkPawnAlign(player));
             value += checkPawnPotential(ai) - checkPawnPotential(player);
             break;
         case 3:
             value = 25*(checkWin(ai) - checkWin(player));
-            value += 0.2*(checkPawnAlign(ai) - checkPawnAlign(player));
+            value += 0.15*(checkPawnAlign(ai) - checkPawnAlign(player));
             value += checkPawnDistance(ai) - checkPawnDistance(player);
             value += 0.5*(checkPawnPotential(ai) - checkPawnPotential(player));
     }
