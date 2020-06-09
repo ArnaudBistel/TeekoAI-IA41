@@ -194,7 +194,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                         bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
                         alpha = max(alpha,bestValue);
                         if(alpha >= beta)
-                            break;
+                            return bestValue;
 
                     }
                 }
@@ -208,11 +208,11 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                             int new_board[5][5];
                             this->copyBoard(board,new_board);
                             new_board[i][j] = 0;
-                            new_board[index/5][index%4] = this->getID();
+                            new_board[index/5][index%5] = this->getID();
                             bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
                             alpha = max(alpha,bestValue);
                             if(alpha >= beta)
-                                break;
+                                return bestValue;
                         }
                     }
                 }
@@ -232,7 +232,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                         bestValue = min(bestValue,minMax(new_board,depth-1, true,alpha,beta));
                         beta = min(beta,bestValue);
                         if(alpha >= beta)
-                            break;
+                            return bestValue;
 
                     }
                 }
@@ -246,17 +246,16 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                             int new_board[5][5];
                             this->copyBoard(board,new_board);
                             new_board[i][j] = 0;
-                            new_board[index/5][index%4] = playerID;
+                            new_board[index/5][index%5] = playerID;
                             bestValue = min(bestValue,minMax(new_board,depth-1, true,alpha,beta));
                             beta = min(beta,bestValue);
                             if(alpha >= beta)
-                                break;
+                                return bestValue;
                         }
                     }
                 }
             }
         }
-
     }
 }
 
@@ -279,14 +278,14 @@ int AIPlayer::evaluateBoard(int board[5][5]){
 
     switch(this->getDifficulty()){
         case 2:
-            value = 25*(checkWin(ai) - checkWin(player));
-            value += 0.25*(checkPawnAlign(ai) - checkPawnAlign(player));
+            value = 40*(checkWin(ai) - checkWin(player));
+            value += 0.3*(checkPawnAlign(ai) - checkPawnAlign(player));
             value += checkPawnPotential(ai) - checkPawnPotential(player);
             break;
         case 3:
-            value = 25*(checkWin(ai) - checkWin(player));
+            value = 40*(checkWin(ai) - checkWin(player));
             value += 0.15*(checkPawnAlign(ai) - checkPawnAlign(player));
-            value += checkPawnDistance(ai) - checkPawnDistance(player);
+            value += 2*(checkPawnDistance(ai) - checkPawnDistance(player));
             value += 0.5*(checkPawnPotential(ai) - checkPawnPotential(player));
     }
     return value;
@@ -308,46 +307,50 @@ int AIPlayer::checkPawnPotential(vector<int> pawns){
     vector <int> corner = {0,4,20,24}, sideMid = {2,10,14,22}, sideCorner = {1,3,5,9,15,19,21,23}, middleCorner = {6,7,8,11,13,16,17,18}; //Number of possible combinaisons : corner (4) sideMid (5) sideCorner(6) middleCorner(10) middle (12)
 
     int value = 0;
-    for(int i = 0 ; i< (int) pawns.size() ; i++){
-        if (std::find(corner.begin(),corner.end(), pawns[i]) != corner.end()){
-            value += 4;
+    if(pawns.size()>1){
+        for(int i = 0 ; i< (int) pawns.size() ; i++){
+            if (std::find(corner.begin(),corner.end(), pawns[i]) != corner.end()){
+                value += 4;
+            }
+            else if (std::find(sideMid.begin(),sideMid.end(), pawns[i]) != sideMid.end()){
+                value += 5;
+            }
+            else if (std::find(sideCorner.begin(),sideCorner.end(), pawns[i]) != sideCorner.end()){
+                value += 6;
+            }
+            else if (std::find(middleCorner.begin(),middleCorner.end(), pawns[i]) != middleCorner.end()){
+                value += 10;
+            }
+            else{
+                value += 12;
+            }
         }
-        else if (std::find(sideMid.begin(),sideMid.end(), pawns[i]) != sideMid.end()){
-            value += 5;
-        }
-        else if (std::find(sideCorner.begin(),sideCorner.end(), pawns[i]) != sideCorner.end()){
-            value += 6;
-        }
-        else if (std::find(middleCorner.begin(),middleCorner.end(), pawns[i]) != middleCorner.end()){
-            value += 10;
-        }
-        else{
-            value += 12;
-        }
+        value /= pawns.size();
     }
-    value /= pawns.size();
     return value;
 }
 
 int AIPlayer::checkPawnAlign(vector<int> pawns){
     int value = 0;
-    vector <vector <int>> sub;
-    createSubSequences(sub, pawns);
-    for (int i = 0 ; i < (int) sub.size() ; i++){
-        if(isValidSquare(sub[i])){
-            value += pow(sub[i].size(),2);
-        }
-        if(isValidLine(sub[i])){
-            value += pow(sub[i].size(),2);
-        }
-        if(isValidColumn(sub[i])){
-            value += pow(sub[i].size(),2);
-        }
-        if(isValidDiag(sub[i],true)){
-            value += pow(sub[i].size(),2);
-        }
-        if(isValidDiag(sub[i], false)){
-            value += pow(sub[i].size(),2);
+    if(pawns.size()>1){
+        vector <vector <int>> sub;
+        createSubSequences(sub, pawns);
+        for (int i = 0 ; i < (int) sub.size() ; i++){
+            if(isValidSquare(sub[i])){
+                value += pow(sub[i].size(),2);
+            }
+            if(isValidLine(sub[i])){
+                value += pow(sub[i].size(),2);
+            }
+            if(isValidColumn(sub[i])){
+                value += pow(sub[i].size(),2);
+            }
+            if(isValidDiag(sub[i],true)){
+                value += pow(sub[i].size(),2);
+            }
+            if(isValidDiag(sub[i], false)){
+                value += pow(sub[i].size(),2);
+            }
         }
     }
     return value;
