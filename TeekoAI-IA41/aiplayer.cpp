@@ -125,8 +125,8 @@ void AIPlayer::findMove(int  board [5][5])
                             int new_board[5][5];
                             this->copyBoard(board,new_board);
                             new_board[i][j] = 0;
-                            new_board[index/5][index%4] = this->getID();
-                            moveValue = minMax(new_board,(this->difficulty) * 2, false,INT32_MIN,INT32_MAX);
+                            new_board[index/5][index%5] = this->getID();
+                            moveValue = minMax(new_board,this->getDifficulty(), false,INT32_MIN,INT32_MAX);
                             if(moveValue > bestValue){
                                 bestValue = moveValue;
                                 bestIndex = index;
@@ -146,7 +146,7 @@ void AIPlayer::findMove(int  board [5][5])
                         int new_board[5][5];
                         this->copyBoard(board,new_board);
                         new_board[i][j] = this->getID();
-                        moveValue = minMax(new_board,(this->difficulty) * 2, false,INT32_MIN,INT32_MAX);
+                        moveValue = minMax(new_board,this->getDifficulty(), false,INT32_MIN,INT32_MAX);
 
                         if(moveValue > bestValue){
                             bestValue = moveValue;
@@ -184,7 +184,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
 
     if(is_maximizing){
         int bestValue = INT32_MIN;
-        if(player.size() < 4){
+        if(ai.size() < 4){
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
                     if (board[i][j] == 0){
@@ -218,11 +218,12 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                 }
             }
         }
+        return bestValue;
     }
     else{
         int bestValue = INT32_MAX;
         int playerID = ((this->getID() == 1) ? 2 : 1);
-        if(ai.size() < 4){
+        if(player.size() < 4){
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
                     if (board[i][j] == 0){
@@ -256,6 +257,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                 }
             }
         }
+        return bestValue;
     }
 }
 
@@ -278,15 +280,16 @@ int AIPlayer::evaluateBoard(int board[5][5]){
 
     switch(this->getDifficulty()){
         case 2:
-            value = 40*(checkWin(ai) - checkWin(player));
-            value += 0.3*(checkPawnAlign(ai) - checkPawnAlign(player));
+            value = 30*(checkWin(ai) - checkWin(player));
+            value += 0.6*(checkPawnAlign(ai,board) - checkPawnAlign(player,board));
             value += checkPawnPotential(ai) - checkPawnPotential(player);
             break;
         case 3:
-            value = 40*(checkWin(ai) - checkWin(player));
-            value += 0.15*(checkPawnAlign(ai) - checkPawnAlign(player));
-            value += 2*(checkPawnDistance(ai) - checkPawnDistance(player));
-            value += 0.5*(checkPawnPotential(ai) - checkPawnPotential(player));
+            value = 30*(checkWin(ai) - checkWin(player));
+            value += 0.4*(checkPawnAlign(ai,board) - checkPawnAlign(player,board));
+            value += 1.5*(checkPawnDistance(ai) - checkPawnDistance(player));
+            value += 0.8*(checkPawnPotential(ai) - checkPawnPotential(player));
+
     }
     return value;
 }
@@ -294,12 +297,14 @@ int AIPlayer::evaluateBoard(int board[5][5]){
 
 int AIPlayer::checkPawnDistance(vector<int> pawns){
     int value = 0;
-    if(pawns.size() > 1){
-        for(int i = 1 ; i < (int) pawns.size() - 1 ; i++){
-            value += (int) sqrt(std::pow((pawns[i] / 5) - (pawns[i-1] / 5),2 ) + std::pow((pawns[i] % 5) - (pawns[i-1] % 5),2));
+        if(pawns.size() > 1){
+            for(int i = 1 ; i < (int) pawns.size(); i++){
+                value += (int) sqrt(std::pow((pawns[i] / 5) - (pawns[i-1] / 5),2 ) + std::pow((pawns[i] % 5) - (pawns[i-1] % 5),2));
+            }
+            value = (pawns.size() *5)/value;
         }
-    }
-    return value;
+
+        return value;
 }
 
 int AIPlayer::checkPawnPotential(vector<int> pawns){
@@ -310,19 +315,19 @@ int AIPlayer::checkPawnPotential(vector<int> pawns){
     if(pawns.size()>1){
         for(int i = 0 ; i< (int) pawns.size() ; i++){
             if (std::find(corner.begin(),corner.end(), pawns[i]) != corner.end()){
-                value += 4;
+                value += 2;
             }
             else if (std::find(sideMid.begin(),sideMid.end(), pawns[i]) != sideMid.end()){
-                value += 5;
+                value += 4;
             }
             else if (std::find(sideCorner.begin(),sideCorner.end(), pawns[i]) != sideCorner.end()){
-                value += 6;
+                value += 7;
             }
             else if (std::find(middleCorner.begin(),middleCorner.end(), pawns[i]) != middleCorner.end()){
-                value += 10;
+                value += 11;
             }
             else{
-                value += 12;
+                value += 16;
             }
         }
         value /= pawns.size();
@@ -330,29 +335,29 @@ int AIPlayer::checkPawnPotential(vector<int> pawns){
     return value;
 }
 
-int AIPlayer::checkPawnAlign(vector<int> pawns){
+int AIPlayer::checkPawnAlign(vector<int> pawns, int board[5][5]){
     int value = 0;
-    if(pawns.size()>1){
-        vector <vector <int>> sub;
-        createSubSequences(sub, pawns);
-        for (int i = 0 ; i < (int) sub.size() ; i++){
-            if(isValidSquare(sub[i])){
-                value += pow(sub[i].size(),2);
-            }
-            if(isValidLine(sub[i])){
-                value += pow(sub[i].size(),2);
-            }
-            if(isValidColumn(sub[i])){
-                value += pow(sub[i].size(),2);
-            }
-            if(isValidDiag(sub[i],true)){
-                value += pow(sub[i].size(),2);
-            }
-            if(isValidDiag(sub[i], false)){
-                value += pow(sub[i].size(),2);
-            }
+    vector <vector <int>> sub;
+    createSubSequences(sub, pawns);
+    int maxSquare = 0, maxLine = 0, maxCol = 0, maxLDiag = 0, maxRDiag = 0;
+    for (int i = 0 ; i < (int) sub.size() ; i++){
+        if(isValidSquare(sub[i]) && canMakeSquare(sub[i],board)){
+            maxSquare = max(maxSquare,(int) pow(sub[i].size(),2));
+        }
+        if(isValidLine(sub[i]) && canMakeLine(sub[i],board)){
+            maxLine = max(maxLine,(int) pow(sub[i].size(),2));
+        }
+        if(isValidColumn(sub[i]) && canMakeCol(sub[i],board)){
+            maxCol = max(maxCol,(int) pow(sub[i].size(),2));
+        }
+        if(isValidDiag(sub[i],true) && canMakeRDiag(sub[i],board)){
+            maxRDiag = max(maxRDiag,(int) pow(sub[i].size(),2));
+        }
+        if(isValidDiag(sub[i], false) && canMakeLDiag(sub[i],board)){
+            maxLDiag = max(maxLDiag,(int) pow(sub[i].size(),2));
         }
     }
+    value = maxSquare + maxCol + maxLDiag + maxLine + maxRDiag;
     return value;
 }
 
@@ -480,6 +485,172 @@ bool AIPlayer::isValidDiag(vector<int> pawns, bool right){
     }
     return valid;
 }
+
+bool AIPlayer::canMakeSquare(vector<int> pawns, int board[5][5]){
+    bool result = false;
+    int x,row,col,thisId,otherId;
+    x = pawns[0];
+    row = x / 5;
+    col = x%5;
+    thisId = board[row][col];
+    otherId = (thisId == 1) ? 2 : 1;
+    if(pawns.size() == 1){
+
+        if(row > 0 && col > 0){
+            if(board[row-1][col-1] != otherId && board[row-1][col] != otherId && board[row][col-1] != otherId)
+                result = true;
+        }
+        if(row > 0 && col < 4){
+            if(board[row-1][col+1] != otherId && board[row-1][col] != otherId && board[row][col+1] != otherId)
+                result = true;
+        }
+        if(row < 4 && col < 4){
+            if(board[row+1][col+1] != otherId && board[row+1][col] != otherId && board[row][col+1] != otherId)
+                result = true;
+        }
+        if(row < 4 && col > 0){
+            if(board[row+1][col-1] != otherId && board[row+1][col] != otherId && board[row][col-1] != otherId)
+                result = true;
+        }
+    }
+    else if (pawns.size() == 2){
+        if(pawns[1] == x +1){
+            if(row > 0 && board[row-1][col] != otherId && board[row-1][col+1] != otherId)
+                result = true;
+            if(row < 4 && board[row+1][col] != otherId && board[row+1][col+1] != otherId)
+                result = true;
+        }
+        else if(pawns[1] == x +4){
+            if(board[row+1][col] != otherId && board[row][col-1] != otherId)
+                result = true;
+        }
+        else if(pawns[1] == x +5){
+            if(col > 0 && board[row][col-1] != otherId && board[row+1][col-1] != otherId)
+                result = true;
+            if(col < 4 && board[row][col+1] != otherId && board[row+1][col+1] != otherId)
+                result = true;
+        }
+        else if(pawns[1] == x +6){
+            if(board[row+1][col] != otherId && board[row][col+1] != otherId)
+                result = true;
+        }
+    }
+    else if (pawns.size() == 3){
+        if(pawns[2] == x +5){
+            if(pawns[1] == x+1 && board[row+1][col+1] != otherId)
+                result = true;
+            if(pawns[1] == x+4 && board[row][col-1] != otherId)
+                result = true;
+        }
+        else{
+            if(pawns[1] == x+1 && board[row+1][col] != otherId)
+                result = true;
+            if(pawns[1] == x+5 && board[row][col+1] != otherId)
+                result = true;
+        }
+    }
+    else{
+        result = true;
+    }
+    return result;
+}
+
+bool AIPlayer::canMakeLine(vector<int> pawns, int board[5][5]){
+    bool result = false;
+    int x,row,col,thisId,otherId;
+    x = pawns[0];
+    row = x / 5;
+    col = x%5;
+    thisId = board[row][col];
+    otherId = (thisId == 1) ? 2 : 1;
+    if(board[row][1] != otherId && board[row][2] != otherId && board[row][3] != otherId){
+        if(board[row][0] != otherId || board[row][4] != otherId)
+            result = true;
+    }
+    return result;
+}
+bool AIPlayer::canMakeCol(vector<int> pawns, int board[5][5]){
+    bool result = false;
+    int x,row,col,thisId,otherId;
+    x = pawns[0];
+    row = x / 5;
+    col = x%5;
+    thisId = board[row][col];
+    otherId = (thisId == 1) ? 2 : 1;
+    if(board[1][col] != otherId && board[2][col] != otherId && board[3][col] != otherId){
+        if(board[0][col] != otherId || board[4][col] != otherId)
+            result = true;
+    }
+    return result;
+}
+bool AIPlayer::canMakeRDiag(vector<int> pawns, int board[5][5]){
+    bool result = false;
+    int x,row,col,thisId,otherId;
+    x = pawns[0];
+    row = x / 5;
+    col = x%5;
+    thisId = board[row][col];
+    otherId = (thisId == 1) ? 2 : 1;
+    if(row == col){
+        if(board[1][1] != otherId && board[2][2] != otherId && board[3][3] != otherId){
+            if(board[0][0] != otherId || board[4][4] != otherId)
+                result = true;
+        }
+    }
+    else{
+        while(row > 0 && col > 0){
+            row--;
+            col--;
+        }
+        for(int i = 0;i<4;i++){
+            if (board[row][col] != otherId){
+                result = true;
+            }
+            else{
+                result = false;
+                i=4;
+            }
+            row++;
+            col++;
+        }
+    }
+    return result;
+}
+bool AIPlayer::canMakeLDiag(vector<int> pawns, int board[5][5]){
+    bool result = false;
+    int x,row,col,thisId,otherId;
+    x = pawns[0];
+    row = x / 5;
+    col = x%5;
+    thisId = board[row][col];
+    otherId = (thisId == 1) ? 2 : 1;
+    if(row + col == 4){
+        if(board[1][3] != otherId && board[2][2] != otherId && board[3][1] != otherId){
+            if(board[0][4] != otherId || board[4][0] != otherId)
+                result = true;
+        }
+    }
+    else{
+        while(row > 0 && col <4){
+            row--;
+            col++;
+        }
+        for(int i = 0;i<4;i++){
+            if (board[row][col] != otherId){
+                result = true;
+            }
+            else{
+                result = false;
+                i=4;
+            }
+            row++;
+            col--;
+        }
+    }
+    return result;
+}
+
+
 
 int AIPlayer::checkWin(vector <int> pawns ){
     int won, lineCount = 1, columnCount = 1, diag_rCount = 1, diag_lCount = 1, squareCount = 1;
