@@ -31,9 +31,9 @@ HEADERS += \
     board.h \
     game.h \
     home.h \
+    oldhome.h \
     pawn.h \
     player.h \
-    playerpanel.h \
     router.h
 
 FORMS +=
