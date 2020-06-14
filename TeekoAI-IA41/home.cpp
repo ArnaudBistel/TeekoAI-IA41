@@ -1,9 +1,19 @@
 #include "home.h"
 #include "Router.h"
 
+// Page d'accueil de l'app qui permet de paramétrer le jeu
+// IA contre IA, Humain contre IA, Humain contre Humain
+// Difficulté de l'IA si elle est activée
 
+
+// -----------------------------------
+// ---------- CONSTRUCTOR -----------
+// -----------------------------------
+// met en place tous les éléments graphique qui constituent la page
 Home::Home(QWidget *parent, QString name):
     QWidget(parent),
+
+    // ATTRIBUTS
 
     // top layout, contient le titre de l'app
     title_label("Teeko"),
@@ -29,11 +39,11 @@ Home::Home(QWidget *parent, QString name):
     start_button("Démarrer le jeu"),
     restart_button("Recommencer"),
 
-
     vertical_layout(),
     params_layout()
-
 {
+
+    // nom de la page pour switcher entre les pages via le Routeur
     this->setObjectName(name);
 
     // méthode qui permet la transition entre les différentes pages de l'app
@@ -60,14 +70,12 @@ Home::Home(QWidget *parent, QString name):
     // -------------------------------------
     // Box de congfiguration du mode de jeu
     // -------------------------------------
-    //configuration_form->setVerticalSpacing(15);
     configuration_form.setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
     connect(&button_ia_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
-
+    // Humain contre IA est préselectionné
     button_human_vs_ia.setChecked(true);
     connect(&button_human_vs_ia, SIGNAL(clicked()), this, SLOT(enableDifficultyChoice()));
-
     connect(&button_human_vs_human, SIGNAL(clicked()), this, SLOT(disableDifficultyChoice()));
 
     configuration_form.addRow("IA vs IA\t\t", &button_ia_vs_ia);
@@ -143,6 +151,10 @@ void Home::launch_game()
 
 
 
+// ------------------------------------
+// ------------- SETTERS --------------
+// ------------------------------------
+
 // si une IA est choisie dans le mode de jeu
 // on peut modifier sa force
 void Home::enableDifficultyChoice()
@@ -162,6 +174,11 @@ void Home::disableDifficultyChoice()
     this->button_hard.setEnabled(false);
 }
 
+
+
+// ------------------------------------
+// ------------- GETTERS --------------
+// ------------------------------------
 
 bool Home::isIAVsIA()
 {
@@ -196,8 +213,6 @@ bool Home::isHard()
 {
     return this->button_hard.isChecked();
 }
-
-
 
 
 Home::~Home()

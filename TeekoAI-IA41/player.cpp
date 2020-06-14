@@ -1,6 +1,6 @@
 #include "player.h"
 
-
+// CONSTRUCTOR
 Player::Player(QString name, bool ia, int id) : name(name), ia(ia), id(id), played(), pion_on_board(), previous_index(-1)
 {
 
@@ -16,7 +16,6 @@ Player& Player::operator=(const Player& pl)
     this->id = pl.id;
     this->name 	= pl.name;
     this->ia    = pl.ia;
-//    std::cout << "dans = " << pl.name << std::endl;
     return *this;
 }
 
@@ -121,6 +120,7 @@ int Player::getPreviousIndex()
     return this->previous_index;
 }
 
+// méthode vide redéfinie par IAPlayer
 int Player::getIAMove(int  board [5][5])
 {
     return -1;

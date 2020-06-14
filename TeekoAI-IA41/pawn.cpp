@@ -6,12 +6,21 @@
 // au joueur 2 (rouge)
 // ou non sélectionné (blanc)
 
-// constructor
+
+// -----------------------------------
+// ---------- CONSTRUCTORS -----------
+// -----------------------------------
 Pawn::Pawn () : QPushButton(), index(), color(), selected(), player(), selectable()
 {
     this->initStyle();
 }
 
+Pawn::Pawn(const QString &text, QWidget *parent): QPushButton(text, parent), index(), color(), selected(), player(), selectable()
+{
+    this->initStyle();
+}
+
+// constructor de copie
 Pawn::Pawn(Pawn const & p)
 {
     this->index = p.index;
@@ -22,6 +31,10 @@ Pawn::Pawn(Pawn const & p)
     this->initStyle();
 }
 
+
+// -----------------------------------
+// ---------- OPERATORS -----------
+// -----------------------------------
 Pawn& Pawn::operator= (Pawn const & p)
 {
     this->index = p.index;
@@ -34,12 +47,9 @@ Pawn& Pawn::operator= (Pawn const & p)
 }
 
 
-Pawn::Pawn(const QString &text, QWidget *parent): QPushButton(text, parent), index(), color(), selected(), player(), selectable()
-{
-    this->initStyle();
-}
-
-
+// méthode d'initialisation du style d'un bouton
+// blanc (donc représente une case vide)
+// forme arrondie
 void Pawn::initStyle()
 {
     // de base le pion est blanc (transparent)
@@ -58,6 +68,7 @@ void Pawn::initStyle()
 // -----------------------------------
 
 // modifie la vue du pion si il est sélecitonné ou non
+// Le pion "monte" et son ombre devient diffuse quand il est sélectionné
 void Pawn::isSelected(bool b, bool reset)
 {
     this->selected = b;
@@ -92,11 +103,13 @@ void Pawn::isSelected(bool b, bool reset)
         // son ombre redevient courte
         this->setShadow(0, 0);
     }
-
 }
 
 
 // Bouton sélectionnable dans le cas d'un déplacement de pion
+// Les boutons sélectionnable sont les boutons où un pion qui
+// est sélectionné peut être déplacé
+// On représente cet état par un cercle de pointillés
 void Pawn::setSelectable(bool b)
 {
     // est sélectionnable
@@ -131,6 +144,9 @@ void Pawn::setSelectable(bool b)
 
 
 // modifie la couleur selon qu'il a été choisi par un joueur ou bien n'appartient à personne
+// joueur 1 = bleu
+// joueur 2 = rouge
+// pas de joueur = blanc
 void Pawn::setColor(int c)
 {
     // n'appartient à personne (blanc)

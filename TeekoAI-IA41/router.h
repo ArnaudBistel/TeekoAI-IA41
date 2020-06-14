@@ -44,6 +44,7 @@ private:
 
     // ------------- FRIENDS -------------
     friend class Board;
+    friend class Game;
 };
 
 

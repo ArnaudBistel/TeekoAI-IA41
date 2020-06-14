@@ -21,24 +21,21 @@ Router::Router()
 }
 
 
-// recommencer une partie après appuie d'un des boutons Recommencer
+// recommencer une partie après appuie d'un des boutons Recommencer (de l'accueil ou de
+// la page de jeu
 void Router::restartGame()
 {
     // stop thread du jeu
     game->terminate();
-    qDebug() << "try to stop thread";
 
     while(!game->isFinished()){}
 
     if(!game->isRunning())
     {
-        qDebug() << "thread is stopped";
         // réinitialise le jeu
+        board->reinit();
         game->restartGame();
         this->setGameParameters();
-
-//        QThread::msleep(300);
-        qDebug() << "READY TOO !!!!";
 
         // affiche la page de jeu
         this->setCurrentWidget(board);
@@ -49,6 +46,7 @@ void Router::restartGame()
 }
 
 
+// On met en pause l'IA quand le joueur retourne à la page d'accueil
 void Router::pauseGame()
 {
     this->game->setPause(true);
@@ -59,24 +57,24 @@ void Router::pauseGame()
 // Méthode de routage
 void Router::changeOnglet(QString name)
 {
-    // Home, page d'accueil
+    // Vers Home, page d'accueil
     if((name == home->objectName()) && home)
     {
         this->setCurrentWidget(home);
-//        this->board->setBoardLabelEnabled(true);
         return;
     }
 
-    // Board, page du jeu
+    // Vers le Board, page du jeu
     else if((name == board->objectName()) && board)
     {
+        // si le jeu était on pause on enlève la pause
         if (game->isPaused())
         {
             game->setPause(false);
         } else
         {
             this->setGameParameters();
-//            game->setPause(false);
+
             // lance le thread de jeu
             game->start();
         }
@@ -92,12 +90,14 @@ void Router::changeOnglet(QString name)
 }
 
 
+// Définie les paramètres du jeu suivant les choix fait dans la page d'accueil
 void Router::setGameParameters()
 {
     // on récupère les paramètres de configuration et les transmets à
     // Game et au board
     int mode = 0;
 
+    // IA vs IA
     if (home->isIAVsIA())
     {
         mode = 1;
@@ -105,22 +105,24 @@ void Router::setGameParameters()
         board->setOnlyIA(true);
 
     }
+
+    // Humain vs IA
     else if (home->isHumanVsIA())
     {
         mode = 2;
         board->displayPlayers("HUMAN", "IA");
         board->setOnlyIA(false);
-//        board->setBoardLabelEnabled(true);
     }
 
+    // Humain vs Humain
     else if (home->isHumanVsHuman())
     {
         mode = 3;
         board->displayPlayers("HUMAN", "HUMAN");
         board->setOnlyIA(false);
-//        board->setBoardLabelEnabled(true);
     }
 
+    // difficulté de l'ia
     int difficulty = 0;
     if (home->isEasy())
     {
@@ -147,13 +149,10 @@ void Router::setGameParameters()
 // ------------- GETTERS -------------
 // -----------------------------------
 
-
 Board& Router::getBoard()
 {
     return *board;
 }
-
-
 
 
 Router::~Router()

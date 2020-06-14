@@ -9,7 +9,6 @@ Game::Game(QWidget *parent) : player1(), player2(), current_player(), win(), boa
 }
 
 
-
 // -------------------------------------------
 // -------------- GAME METHODS ---------------
 // -------------------------------------------
@@ -28,18 +27,18 @@ void Game::run()
             if (current_player->isIA())
             {
                 QThread::msleep(500);
-//                static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(false);
                 int move = this->current_player->getIAMove(this->board);
                 emit playerPlayed(move);
             }
         }
+
 
         // joueur courant a choisi son action
         if (current_player->hasPlayed())
         {
 
             // imprime le board dans la console
-            static_cast<Router*>(this->parent)->getBoard().printBoard();
+            this->printBoard();
 
             // on vérifie si le dernier déplacement a permis une victoire
             this->win = this->checkIfWins(current_player->getID());
@@ -48,7 +47,7 @@ void Game::run()
             if (this->win)
             {
                 // affiche le vainqueur
-                static_cast<Router*>(this->parent)->getBoard().announceWinner(current_player->getID(), current_player->getName());
+                emit theresAWinner(current_player->getID(), current_player->getName());
             }
 
             // pas de victoire
@@ -74,9 +73,6 @@ void Game::run()
 // Méthode lancée en cas d'appuie sur Recommencer
 void Game::restartGame()
 {
-    // reset le board
-    static_cast<Router*>(this->parent)->getBoard().reinit();
-
     // reset des attributs de Game
     this->win = false;
     this->pause = false;
@@ -94,25 +90,10 @@ void Game::restartGame()
     player1->setPionOnBoard(0);
     player1->setPreviousIndex(-1);
 
-//    player1.setPlayed(false);
-//    player1.setChosePionToMove(false);
-//    player1.setPionOnBoard(0);
-//    player1.setPreviousIndex(-1);
-
-//    player2.setPlayed(false);
-//    player2.setChosePionToMove(false);
-//    player2.setPionOnBoard(0);
-//    player2.setPreviousIndex(-1);
-
     player2->setPlayed(false);
     player2->setChosePionToMove(false);
     player2->setPionOnBoard(0);
     player2->setPreviousIndex(-1);
-
-//    // réactive le board
-//    if(! (player1->isIA() && player2->isIA()))
-//        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(true);
-
 }
 
 
@@ -153,45 +134,60 @@ void Game::playerPlayed(int index)
         this->board[line][col] = this->current_player->getID();
 
         // mise à jour de la vue
-        static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false, false);
-
-        this->current_player->incrementPionOnBoard();
-        this->current_player->setPlayed(true);
-
+        if (!this->current_player->hasPlayed())
+        {
+            emit updateView(current_player->getID(), line, col, false, false, false);
+            this->current_player->setPlayed(true);
+            this->current_player->incrementPionOnBoard();
+        }
 
     // quand tous les joueurs ont joué leur 4 pions, ils doivent déplacer un pion par tour
     } else {
 
         // si le joueur n'a pas encore sélectionné de pion à déplacer
+        // seulement utilisé quand le joueur courant n'est pas une IA
         if (!current_player->chosePionToMove())
         {
             this->current_player->setChosePionToMove(true);
+
             this->board[line][col] = 0;
 
             // sauvegarde l'ancienne position du pion
             this->current_player->setPreviousIndex(index);
 
             // mise à jour de la vue
-            static_cast<Router*>(this->parent)->getBoard().placePion(0, line, col, true, true, false);
-            static_cast<Router*>(this->parent)->getBoard().displayPossibleMoves(line, col);
+            emit updateView(0, line, col, true, true, false);
+
+            emit displayPossibleMoves(line, col);
 
         // si le joueur a déjà choisi son pion à déplacer
-        } else {
-
-            // cas où joueur déselctionne son pion pour en choisir un autre
+        } else {            
+            // cas où joueur déselectionne son pion pour en choisir un autre
             if (index == this->current_player->getPreviousIndex())
             {
                 this->current_player->setChosePionToMove(false);
-                static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, true, true);
+                emit updateView(current_player->getID(), line, col, false, true, true);
+
                 this->board[line][col] = current_player->getID();
                 this->prepareBoardForNextTurn();
 
             // cas où il déplace son pion
             } else {
+                if (this->current_player->isIA())
+                {
+                    int previous_line = (int) this->current_player->getPreviousIndex() / 5;
+                    int previous_col = this->current_player->getPreviousIndex() % 5;
+
+                    // enlève le pion de sa place précédente
+                    this->board[previous_line][previous_col] = 0;
+                    // mise à jour de la vue
+                    emit updateView(0, previous_line, previous_col, true, true, false);
+                    emit displayPossibleMoves(previous_line, previous_col);
+                }
                 this->board[line][col] = this->current_player->getID();
-                static_cast<Router*>(this->parent)->getBoard().placePion(current_player->getID(), line, col, false, false, false);
+                emit updateView(current_player->getID(), line, col, false, false, false);
                 this->current_player->setPlayed(true);
-                static_cast<Router*>(this->parent)->getBoard().unselectPawn(current_player->getPreviousIndex());
+                emit unselectPawn(current_player->getPreviousIndex());
             }
         }
     }
@@ -204,7 +200,8 @@ void Game::playerPlayed(int index)
 // Demande au board de préparer la vue pour le joueur transmis en param.
 void Game::prepareBoardForNextTurn()
 {
-    static_cast<Router*>(this->parent)->getBoard().prepareBoardForCurrentPlayer(current_player->getID(), current_player->pionOnBoard());
+    static_cast<Router*>(this->parent)->getBoard().setUpdated(false);
+    emit prepareBoardForNextTurn(current_player->getID(), current_player->pionOnBoard());
     QThread::msleep(200);
 }
 
@@ -226,7 +223,7 @@ void Game::printBoard()
             }
             std::cout<<"\n";
     }
-
+    std::cout<<"\n";
 }
 
 
@@ -342,21 +339,19 @@ void Game::chooseFirstPlayer()
     int random = (rand() % (MAX - MIN + 1)) + MIN;
     if (random > 50 )
     {
-//        current_player = &player1;
         current_player = player1;
-        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(1);
+        emit displayCurrentPlayer(1);
 
     } else {
         current_player = player2;
-//        current_player = &player2;
-        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(2);
+        emit displayCurrentPlayer(2);
     }
 
     if (!current_player->isIA())
     {
-        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(true);
+        emit enableBoard();
     } else {
-        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(false);
+        emit disableBoard();
     }
 }
 
@@ -364,31 +359,24 @@ void Game::chooseFirstPlayer()
 // Switche le joueur courant.
 void Game::changeCurrentPlayer()
 {
-//    if (current_player == &player1)
     if (current_player == player1)
     {
-//        player1.setPlayed(false);
-//        player1.setChosePionToMove(false);
-//        current_player = &player2;
         player1->setPlayed(false);
         player1->setChosePionToMove(false);
         current_player = player2;
-        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(2);
+        emit displayCurrentPlayer(2);
     }else
     {
-//        player2.setPlayed(false);
-//        player2.setChosePionToMove(false);
-//        current_player = &player1;
         player2->setPlayed(false);
         player2->setChosePionToMove(false);
         current_player = player1;
-        static_cast<Router*>(this->parent)->getBoard().displayCurrentPlayer(1);
+        emit displayCurrentPlayer(1);
     }
     if (!current_player->isIA())
     {
-        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(true);
+        emit enableBoard();
     } else {
-        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(false);
+        emit disableBoard();
     }
 }
 
@@ -400,16 +388,12 @@ void Game::changeCurrentPlayer()
 
 void Game::setPlayer1(Player pl)
 {
-//    this->player1 = pl;
-//    this->player1.isIA();
     this->player1 = &pl;
     this->player1->isIA();
 }
 
 void Game::setPlayer2(Player pl)
 {
-//    this->player2 = pl;
-//    this->player2.isIA();
     this->player2 = &pl;
     this->player2->isIA();
 }
@@ -421,27 +405,12 @@ void Game::setMode(int mode, int diff)
 {
     if (mode == 1)
     {
-//        AIPlayer pl1("Joueur 1", 1, diff);
-//        player1 = pl1;
-
-//        AIPlayer pl2("Joueur 2", 2, diff);
-//        player2 = pl2;
-
         player1 = new AIPlayer("Joueur 1", 1, diff);
         player2 = new AIPlayer("Joueur 2", 2, diff);
     } else if (mode == 2) {
-//        Player pl1("Joueur 1", false, 1);
-//        player1 = pl1;
-
-//        AIPlayer pl2("Joueur 2", 2, diff);
-//        player2 = pl2;
         player1 = new Player("Joueur 1", false, 1);
         player2 = new AIPlayer("Joueur 2", 2, diff);
     } else if (mode == 3) {
-//        Player pl1("Joueur 1", false, 1);
-//        player1 = pl1;
-//        Player pl2("Joueur 2", false, 2);
-//        player2 = pl2;
         player1 = new Player("Joueur 1", false, 1);
         player2 = new Player("Joueur 2", false, 2);
     }
@@ -450,11 +419,19 @@ void Game::setMode(int mode, int diff)
 
 }
 
+
+
 void Game::setPause(bool b)
 {
     this->pause = b;
     if (current_player != NULL)
-        static_cast<Router*>(this->parent)->getBoard().setBoardLabelEnabled(!this->current_player->isIA());
+    {
+        if (this->current_player->isIA()){
+            emit enableBoard();
+        } else {
+            emit disableBoard();
+        }
+    }
 }
 
 

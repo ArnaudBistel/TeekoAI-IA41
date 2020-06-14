@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Board_t {
-    QByteArrayData data[10];
-    char stringdata0[86];
+    QByteArrayData data[19];
+    char stringdata0[241];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -41,12 +41,25 @@ QT_MOC_LITERAL(5, 41, 9), // "beginGame"
 QT_MOC_LITERAL(6, 51, 6), // "holdOn"
 QT_MOC_LITERAL(7, 58, 10), // "tileChosen"
 QT_MOC_LITERAL(8, 69, 9), // "resetGame"
-QT_MOC_LITERAL(9, 79, 6) // "goBack"
+QT_MOC_LITERAL(9, 79, 6), // "goBack"
+QT_MOC_LITERAL(10, 86, 14), // "announceWinner"
+QT_MOC_LITERAL(11, 101, 9), // "placePion"
+QT_MOC_LITERAL(12, 111, 20), // "displayPossibleMoves"
+QT_MOC_LITERAL(13, 132, 12), // "unselectPawn"
+QT_MOC_LITERAL(14, 145, 28), // "prepareBoardForCurrentPlayer"
+QT_MOC_LITERAL(15, 174, 20), // "setBoardLabelEnabled"
+QT_MOC_LITERAL(16, 195, 12), // "disableBoard"
+QT_MOC_LITERAL(17, 208, 11), // "enableBoard"
+QT_MOC_LITERAL(18, 220, 20) // "displayCurrentPlayer"
 
     },
     "Board\0changeInterface\0\0name\0playerPlayed\0"
     "beginGame\0holdOn\0tileChosen\0resetGame\0"
-    "goBack"
+    "goBack\0announceWinner\0placePion\0"
+    "displayPossibleMoves\0unselectPawn\0"
+    "prepareBoardForCurrentPlayer\0"
+    "setBoardLabelEnabled\0disableBoard\0"
+    "enableBoard\0displayCurrentPlayer"
 };
 #undef QT_MOC_LITERAL
 
@@ -56,7 +69,7 @@ static const uint qt_meta_data_Board[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -64,15 +77,24 @@ static const uint qt_meta_data_Board[] = {
        4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   49,    2, 0x06 /* Public */,
-       4,    1,   52,    2, 0x06 /* Public */,
-       5,    0,   55,    2, 0x06 /* Public */,
-       6,    0,   56,    2, 0x06 /* Public */,
+       1,    1,   94,    2, 0x06 /* Public */,
+       4,    1,   97,    2, 0x06 /* Public */,
+       5,    0,  100,    2, 0x06 /* Public */,
+       6,    0,  101,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    0,   57,    2, 0x0a /* Public */,
-       8,    0,   58,    2, 0x0a /* Public */,
-       9,    0,   59,    2, 0x0a /* Public */,
+       7,    0,  102,    2, 0x0a /* Public */,
+       8,    0,  103,    2, 0x0a /* Public */,
+       9,    0,  104,    2, 0x0a /* Public */,
+      10,    2,  105,    2, 0x0a /* Public */,
+      11,    6,  110,    2, 0x0a /* Public */,
+      12,    2,  123,    2, 0x0a /* Public */,
+      13,    1,  128,    2, 0x0a /* Public */,
+      14,    2,  131,    2, 0x0a /* Public */,
+      15,    1,  136,    2, 0x0a /* Public */,
+      16,    0,  139,    2, 0x0a /* Public */,
+      17,    0,  140,    2, 0x0a /* Public */,
+      18,    1,  141,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -84,6 +106,15 @@ static const uint qt_meta_data_Board[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Bool, QMetaType::Bool, QMetaType::Bool,    2,    2,    2,    2,    2,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
+    QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
+    QMetaType::Void, QMetaType::Bool,    2,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    2,
 
        0        // eod
 };
@@ -101,6 +132,15 @@ void Board::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 4: _t->tileChosen(); break;
         case 5: _t->resetGame(); break;
         case 6: _t->goBack(); break;
+        case 7: _t->announceWinner((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 8: _t->placePion((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< bool(*)>(_a[4])),(*reinterpret_cast< bool(*)>(_a[5])),(*reinterpret_cast< bool(*)>(_a[6]))); break;
+        case 9: _t->displayPossibleMoves((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 10: _t->unselectPawn((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 11: _t->prepareBoardForCurrentPlayer((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 12: _t->setBoardLabelEnabled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 13: _t->disableBoard(); break;
+        case 14: _t->enableBoard(); break;
+        case 15: _t->displayCurrentPlayer((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -165,13 +205,13 @@ int Board::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 16;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 7)
+        if (_id < 16)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 7;
+        _id -= 16;
     }
     return _id;
 }

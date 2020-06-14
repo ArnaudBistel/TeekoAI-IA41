@@ -54,6 +54,23 @@ Board::Board(QWidget *parent, QString name):
     // envoi du signal que le joueur a fait son choix
     connect(this,SIGNAL(playerPlayed(int)),  static_cast<Router*>(this->parent())->game,SLOT(playerPlayed(int)));
 
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(theresAWinner(int, QString)), this, SLOT(announceWinner(int, QString)));
+//    connect(static_cast<Router*>(this->parent())->game, SIGNAL(reinitBoard()), this, SLOT(reinit()));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(updateView(int, int, int, bool, bool, bool)), this, SLOT(placePion(int, int, int, bool, bool, bool)));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(displayPossibleMoves(int, int)), this, SLOT(displayPossibleMoves(int, int)));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(unselectPawn(int)), this, SLOT(unselectPawn(int)));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(prepareBoardForNextTurn(int, int)), this, SLOT(prepareBoardForCurrentPlayer(int, int)));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(displayCurrentPlayer(int)), this, SLOT(displayCurrentPlayer(int)));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(disableBoard()), this, SLOT(disableBoard()));
+
+    connect(static_cast<Router*>(this->parent())->game, SIGNAL(enableBoard()), this, SLOT(enableBoard()));
+
 
     // ******************************************
     // ********* Création de le la vue **********
@@ -210,6 +227,10 @@ Board::Board(QWidget *parent, QString name):
 // appelée par Game pour que la vue se mettent à jour et place le pion au bon endroit
 void Board::placePion(int id, int line, int col, bool selected, bool more_than_4, bool unselected)
 {
+    std::cout << "UPDATE ! " << std::endl ;
+    // verrou pour la suynchronization
+//    QMutexLocker verrou(&mutex);
+
     this->board[line][col] = id;
 
     // pion sélectionné
@@ -233,6 +254,8 @@ void Board::placePion(int id, int line, int col, bool selected, bool more_than_4
     } else {
         this->array[line][col]->setPlayer(id);
     }
+    this->setUpdated(true);
+
 }
 
 
@@ -240,7 +263,7 @@ void Board::placePion(int id, int line, int col, bool selected, bool more_than_4
 // affiche les déplacements possible après qu'un joueur a sélectionné un pion
 void Board::displayPossibleMoves(int line, int col)
 {
-    this->enableBoard();
+    this->enableAllPawns();
 
     // permet de déselectionner le pion sélectionné
     this->array[line][col]->setEnabled(true);
@@ -347,6 +370,19 @@ void Board::deletePossibleMoves()
     }
 }
 
+// bloque le plateau momentanément
+void Board::disableBoard()
+{
+    this->board_label.setEnabled(false);
+}
+
+// débloque le plateau
+void Board::enableBoard()
+{
+    this->board_label.setEnabled(true);
+}
+
+
 
 // bloque le plateau momentanément
 void Board::setBoardLabelEnabled(bool b)
@@ -406,7 +442,7 @@ void Board::prepareBoardForCurrentPlayer(int id, int pion_played)
 
 
 // rend tous les pions non clickable
-void Board::enableBoard()
+void Board::enableAllPawns()
 {
     for (int i = 0; i < 5; i++)
     {
@@ -451,6 +487,10 @@ void Board::reinit()
     win_label.setVisible(false);
 //    board_label.setEnabled(false);
     int index = 0;
+    int y = board_label.height()/33;
+    int x = board_label.height()/32.4;
+    int height = board_label.height() / 8.1;
+
     for(int i=0; i<5; i++)
     {
         for(int j=0; j<5; j++)
@@ -470,9 +510,14 @@ void Board::reinit()
             array[i][j]->setColor(0);
             array[i][j]->setPlayer(0);
             array[i][j]->setIndex(index);
+            array[i][j]->setGeometry(x, y, height , height);
             index++;
+            x += board_label.height()/4.90;
         }
+        x = board_label.height()/32.4;
+        y += board_label.height()/4.89;
     }
+
 }
 
 
@@ -512,6 +557,8 @@ void Board::displayPlayers(QString player1, QString player2)
 // affiche qui est le vainqueur
 void Board::announceWinner(int id, QString name)
 {
+    std::cout << "WIN! " ;
+
     // entoure en blanc son panel
     if (id == 1)
     {
@@ -547,7 +594,7 @@ void Board::tileChosen()
 //    if (!onlyIA)
 //        board_label.setEnabled(false);
 
-    // verrou pour la suynchronization
+    // verrou pour la synchronization
     QMutexLocker verrou(&mutex);
 
     QObject* obj = sender();
@@ -555,6 +602,7 @@ void Board::tileChosen()
     int index = button->getIndex();
 
     emit playerPlayed(index);
+//    mutex.unlock();
 }
 
 
@@ -593,6 +641,27 @@ void Board::setOnlyIA(bool b)
 }
 
 
+void Board::setUpdated(bool b)
+{
+    this->updated = b;
+}
+
+
+//void Board::theresAWinner(int id, QString name)
+//{
+//    // entoure en blanc son panel
+//    if (id == 1)
+//    {
+//        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+//    } else {
+//        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+//    }
+
+//    // affiche le label de victoire sur le plateau
+//    win_label.setText("Bravo " + name + " vous avez gagné !");
+//    win_label.setVisible(true);
+
+//}
 
 
 // ------------------------------------
@@ -624,3 +693,10 @@ bool Board::isOnlyIA()
 {
     return this->onlyIA;
 }
+
+
+bool Board::isUpdated()
+{
+    return this->updated;
+}
+
