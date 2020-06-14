@@ -1,11 +1,12 @@
 #ifndef GAME_H
 #define GAME_H
+
 #include <QtWidgets>
 #include "player.h"
 #include "aiplayer.h"
 #include "board.h"
-
 #include <iostream>
+
 typedef int (*pointer_to_arrays)[5];
 
 class Game : public QThread
@@ -47,11 +48,20 @@ public:
 public slots:
     void playerPlayed(int);
 
+signals:
+    void theresAWinner(int, QString);
+    void reinitBoard();
+    void updateView(int, int, int, bool, bool, bool);
+    void displayPossibleMoves(int, int);
+    void unselectPawn(int);
+    void prepareBoardForNextTurn(int, int);
+    void displayCurrentPlayer(int);
+    void disableBoard();
+    void enableBoard();
 
 private:
 
     // ------------- ATTRIBUTES -------------
-//    Player player1, player2, *current_player;
     Player *player1, *player2, *current_player;
     bool win;
     int  board [5][5];

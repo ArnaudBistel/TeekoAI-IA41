@@ -19,12 +19,26 @@ public:
     pointer_to_arrays getBoard();
     void printBoard();
     bool isOnlyIA();
+    bool isUpdated();
+
+    // ------------- SETTERS -------------
+    void setOnlyIA(bool);
+    void setUpdated(bool);
 
     // ------------- SLOTS -------------
 public slots:
     void tileChosen();
     void resetGame();
     void goBack();
+    void announceWinner(int, QString);
+    void placePion(int, int, int, bool, bool, bool);
+    void displayPossibleMoves(int,int);
+    void unselectPawn(int);
+    void prepareBoardForCurrentPlayer(int, int);
+    void setBoardLabelEnabled(bool);
+    void disableBoard();
+    void enableBoard();
+    void displayCurrentPlayer(int);
 
     // ------------- SIGNALS -------------
 signals:
@@ -35,23 +49,15 @@ signals:
 
 private:
     // ---------- PAWN & BOARD METHODS ----------
-    void placePion(int, int, int, bool, bool, bool);
-    void displayPossibleMoves(int,int);
-    void unselectPawn(int);
 
     void deletePossibleMoves();
-    void setBoardLabelEnabled(bool);
-    void prepareBoardForCurrentPlayer(int, int);
-    void enableBoard();
     void initBoardVisible();
     void initBoardInvisible();
     void reinit();
-    void setOnlyIA(bool);
+    void enableAllPawns();
 
     // ------------- PLAYERS METHODS ------------
-    void displayCurrentPlayer(int);
     void displayPlayers(QString, QString);
-    void announceWinner(int, QString);
     void displayWinLabel(QString);
 
 
@@ -62,6 +68,7 @@ private:
     QMutex mutex;
     QWaitCondition sleepSimulator;
     bool onlyIA;
+    bool updated;
 
     // ----------------------------------
     // Fenêtre du jeu
@@ -71,7 +78,6 @@ private:
 
     Pawn* array[5][5];
     QGridLayout but_and_image_layout;
-    QLabel win_label;
 
 
     // ----------------------------------
@@ -88,6 +94,7 @@ private:
     QLabel player2_name_label;
     QLabel player2_type_label;
     QLabel player2_color_label;
+    QLabel win_label;
 
 
     // ----------------------------------
