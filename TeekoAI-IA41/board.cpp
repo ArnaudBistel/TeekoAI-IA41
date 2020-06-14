@@ -83,8 +83,8 @@ Board::Board(QWidget *parent, QString name):
 
     // label contenant le plateau
     board_label.setFixedSize(board_size, board_size);
-    QPixmap board_image("./res/teeko_board_v.png");
-//    QPixmap board_image("../res/teeko_board_v.png");
+//    QPixmap board_image("./res/teeko_board_v.png");
+    QPixmap board_image("../res/teeko_board_v.png");
     board_label.setPixmap(board_image);
     board_label.setScaledContents( true );
 
@@ -144,8 +144,8 @@ Board::Board(QWidget *parent, QString name):
     player1_type_label.setFont(QFont("Comic Sans MS", 12));
     player1_type_label.setAlignment(Qt::AlignHCenter);
     player1_color_label.setAlignment(Qt::AlignHCenter);
-    QPixmap pix("./res/blue_pawn.png");
-//    QPixmap pix("../res/blue_pawn.png");
+//    QPixmap pix("./res/blue_pawn.png");
+    QPixmap pix("../res/blue_pawn.png");
     player1_color_label.setPixmap(pix.scaled((board_label.height() / 8.1) - 10 , (board_label.height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
     player1_layout.addWidget(&player1_name_label);
@@ -166,8 +166,8 @@ Board::Board(QWidget *parent, QString name):
     player2_type_label.setFont(QFont("Comic Sans MS", 12));
     player2_type_label.setAlignment(Qt::AlignHCenter);
     player2_color_label.setAlignment(Qt::AlignHCenter);
-    QPixmap pix2("./res/red_pawn.png");
-//    QPixmap pix2("../res/red_pawn.png");
+//    QPixmap pix2("./res/red_pawn.png");
+    QPixmap pix2("../res/red_pawn.png");
     player2_color_label.setPixmap(pix2.scaled((board_label.height() / 8.1) - 10 , (board_label.height() / 8.1) -10 ,Qt::KeepAspectRatio));
 
     player2_layout.addWidget(&player2_name_label);
