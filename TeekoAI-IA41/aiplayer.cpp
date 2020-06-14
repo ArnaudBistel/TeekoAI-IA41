@@ -16,7 +16,6 @@ AIPlayer& AIPlayer::operator=(const AIPlayer& pl)
     this->move = pl.move;
     this->difficulty = pl.difficulty;
 
-//    std::cout << "dans = " << pl.name << std::endl;
     return *this;
 }
 
@@ -76,7 +75,6 @@ void AIPlayer::findMove(int  board [5][5])
             // choisi au hasard un pion à déplacer parmis ses 4 pions
             srand(time(NULL));
             move = (rand() % (MAX - MIN + 1)) + MIN;
-//            std::cout << "move : " << move << std::endl;
             move = pawns[move];
 
         // si l'IA a déjà placé ses 4 pions et qu'elle a choisi
@@ -91,7 +89,6 @@ void AIPlayer::findMove(int  board [5][5])
             // choisi au hasard un déplacement parmis les déplacements possibles
             srand(time(NULL));
             move = (rand() % (MAX - MIN + 1)) + MIN;
-//            std::cout << "move : " << move << std::endl;
             move = pawns[move];
 
         // si l'IA n'a pas encore placé ses 4 pions

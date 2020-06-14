@@ -103,7 +103,6 @@ void Router::setGameParameters()
         mode = 1;
         board->displayPlayers("IA", "IA");
         board->setOnlyIA(true);
-
     }
 
     // Humain vs IA

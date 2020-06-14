@@ -26,7 +26,7 @@ void Game::run()
         {
             if (current_player->isIA())
             {
-                QThread::msleep(500);
+                QThread::msleep(200);
                 int move = this->current_player->getIAMove(this->board);
                 emit playerPlayed(move);
             }
@@ -47,6 +47,7 @@ void Game::run()
             if (this->win)
             {
                 // affiche le vainqueur
+                emit disableBoard();
                 emit theresAWinner(current_player->getID(), current_player->getName());
             }
 
@@ -59,15 +60,15 @@ void Game::run()
             }
         }
 
+        // le thread dort pendant que le jeu est en pause (sur la page d'accueil)
         while (this->isPaused())
         {
             QThread::msleep(1000);
         }
-
         QThread::msleep(500);
-
     }
 }
+
 
 // Reset le jeu pour une nouvelle partie.
 // Méthode lancée en cas d'appuie sur Recommencer
@@ -94,28 +95,6 @@ void Game::restartGame()
     player2->setChosePionToMove(false);
     player2->setPionOnBoard(0);
     player2->setPreviousIndex(-1);
-}
-
-
-
-// Méthode qui regroupe les méthodes de vérification de victoire.
-bool Game::checkIfWins(int id)
-{
-    bool win;
-    win = this->checkRows(id);
-    if (win)
-        return win;
-    win = this->checkCol(id);
-    if (win)
-        return win;
-    win = this->checkSquare(id);
-    if (win)
-        return win;
-    win = this->checkDiag(id);
-    if (win)
-        return win;
-
-    return false;
 }
 
 
@@ -228,6 +207,28 @@ void Game::printBoard()
 
 
 
+// Méthode qui regroupe les méthodes de vérification de victoire.
+bool Game::checkIfWins(int id)
+{
+    bool win;
+    win = this->checkRows(id);
+    if (win)
+        return win;
+    win = this->checkCol(id);
+    if (win)
+        return win;
+    win = this->checkSquare(id);
+    if (win)
+        return win;
+    win = this->checkDiag(id);
+    if (win)
+        return win;
+
+    return false;
+}
+
+
+// Cherche un alignement de 4 pions en LIGNE
 bool Game::checkRows(int id)
 {
     for (int j = 0 ; j < 2; j++ )
@@ -247,7 +248,7 @@ bool Game::checkRows(int id)
 }
 
 
-
+// Cherche un alignement de 4 pions en COLONNE
 bool Game::checkCol(int id)
 {
     for (int i = 0 ; i < 2; i++ )
@@ -267,7 +268,7 @@ bool Game::checkCol(int id)
 }
 
 
-
+// Cherche une formation de 4 pions en CARRE
 bool Game::checkSquare(int id)
 {
     for(int i=0;i<4;i++)
@@ -288,7 +289,7 @@ bool Game::checkSquare(int id)
 }
 
 
-
+// cherche un alignement de 4 pions en diagonale
 bool Game::checkDiag(int id)
 {
     for (int i = 0 ; i < 2; i++ )
@@ -337,11 +338,14 @@ void Game::chooseFirstPlayer()
     // Génération du nombre aléatoire
     srand(time(NULL));
     int random = (rand() % (MAX - MIN + 1)) + MIN;
+
+    // Joueur 1 commence
     if (random > 50 )
     {
         current_player = player1;
         emit displayCurrentPlayer(1);
 
+    // Joueur 2 commence
     } else {
         current_player = player2;
         emit displayCurrentPlayer(2);
@@ -399,8 +403,8 @@ void Game::setPlayer2(Player pl)
 }
 
 
-
 // Gestion de l'IA
+// Crée les IA si nécessaire en fonction des choix efefctués sur la page d'accueil
 void Game::setMode(int mode, int diff)
 {
     if (mode == 1)
@@ -414,13 +418,10 @@ void Game::setMode(int mode, int diff)
         player1 = new Player("Joueur 1", false, 1);
         player2 = new Player("Joueur 2", false, 2);
     }
-
-
-
 }
 
 
-
+// Jeu mis en pause  par retour à la page d'accueil
 void Game::setPause(bool b)
 {
     this->pause = b;
@@ -433,7 +434,6 @@ void Game::setPause(bool b)
         }
     }
 }
-
 
 
 

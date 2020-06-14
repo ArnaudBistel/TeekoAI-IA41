@@ -15,7 +15,6 @@ Board::Board(QWidget *parent, QString name):
     onlyIA(),
     board_label(this),
     but_and_image_layout(),
-    win_label("", &board_label),
 
     // Panneau affichant les joueurs
     panel_layout (),
@@ -29,6 +28,7 @@ Board::Board(QWidget *parent, QString name):
     player2_name_label("Joueur 2"),
     player2_type_label(""),
     player2_color_label(),
+    win_label("Bravo Joueur 2 \n vous avez gagné !", this),
 
     // retour et recommencer
     bottom_buttons_layout(),
@@ -116,33 +116,33 @@ Board::Board(QWidget *parent, QString name):
     }
 
 
-    // --------- Label de victoire ---------
-    win_label.setAlignment(Qt::AlignCenter);
-    win_label.setFont(QFont("Comic Sans MS", 18, QFont::Bold, false));
-    win_label.setStyleSheet("QLabel {margin-left: 10px; background:white; border-radius: 25px; border: 2px solid black; color: black;}");
-    win_label.setVisible(false);
 
     // layout qui permet la superposition du plateau et du label de victoire
     but_and_image_layout.addWidget(&board_label,0,0);
-    but_and_image_layout.addWidget(&win_label,0,0);
+//    but_and_image_layout.addWidget(&win_label,0,0);
 
 
 
     // ----------------------------------
     // Panneau affichant les données sur les joueurs
     // ----------------------------------
-    panel_layout.insertSpacing(0, screen_height * 1/7);
+    panel_layout.insertSpacing(0, screen_height * 1/11);
+
+    // --------- Label de victoire ---------
+//    win_label.setAlignment(Qt::AlignCenter);
+    win_label.setFont(QFont("Comic Sans MS", 12, QFont::Bold, false));
+    win_label.setVisible(false);
+    panel_layout.addWidget(&win_label);
+    win_label.setStyleSheet("QLabel {background:white; border-radius: 25px; border: 2px solid black; color: blue;}");
+    panel_layout.insertSpacing(2, screen_height * 1/10);
 
     // --------- GroupBox du Joueur 1 ---------
     player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
 
-
     player1_name_label.setFont(QFont("Comic Sans MS", 15));
     player1_name_label.setAlignment(Qt::AlignHCenter);
-
     player1_type_label.setFont(QFont("Comic Sans MS", 12));
     player1_type_label.setAlignment(Qt::AlignHCenter);
-
     player1_color_label.setAlignment(Qt::AlignHCenter);
 //    QPixmap pix("./res/blue_pawn.png");
     QPixmap pix("../res/blue_pawn.png");
@@ -155,13 +155,11 @@ Board::Board(QWidget *parent, QString name):
     panel_layout.addWidget(&player1_groupbox);
 
 
-    panel_layout.insertSpacing(2, screen_height * 1/7);
+    panel_layout.insertSpacing(4, screen_height * 1/10);
 
     // --------- GroupBox du Joueur 2 ---------
 
-    player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 1px solid gray;}");
-
-
+    player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid gray;}");
 
     player2_name_label.setFont(QFont("Comic Sans MS", 15));
     player2_name_label.setAlignment(Qt::AlignHCenter);
@@ -178,8 +176,7 @@ Board::Board(QWidget *parent, QString name):
     player2_groupbox.setLayout(&player2_layout);
     panel_layout.addWidget(&player2_groupbox);
 
-    panel_layout.insertSpacing(4, screen_height * 1/7);
-
+    panel_layout.insertSpacing(6, screen_height * 1/10);
 
 
     // ----------------------------------
@@ -331,9 +328,8 @@ void Board::displayPossibleMoves(int line, int col)
         }
     }
 
-//    if (!onlyIA)
-//        board_label.setEnabled(true);
 }
+
 
 
 // mise à jour de la vue d'un pion déselectionné
@@ -359,11 +355,15 @@ void Board::deletePossibleMoves()
     }
 }
 
+
+
 // bloque le plateau momentanément
 void Board::disableBoard()
 {
     this->board_label.setEnabled(false);
 }
+
+
 
 // débloque le plateau
 void Board::enableBoard()
@@ -373,7 +373,7 @@ void Board::enableBoard()
 
 
 
-// bloque le plateau momentanément
+// bloque ou débloque le plateau
 void Board::setBoardLabelEnabled(bool b)
 {
     this->board_label.setEnabled(b);
@@ -386,9 +386,6 @@ void Board::setBoardLabelEnabled(bool b)
 // dans case adjacente
 void Board::prepareBoardForCurrentPlayer(int id, int pion_played)
 {
-//    if (!onlyIA)
-//        board_label.setEnabled(true);
-
     // moins de 4 pions joués donc joueur place son jeton
     // toutes les cases sur lesquelles aucun jeton n'est placé sont valides
     if (pion_played < 4)
@@ -546,27 +543,31 @@ void Board::displayPlayers(QString player1, QString player2)
 // affiche qui est le vainqueur
 void Board::announceWinner(int id, QString name)
 {
+    // affiche le label de victoire sur le plateau
+    win_label.setText("Bravo " + name + "\n vous avez gagné !");
+    win_label.setVisible(true);
+
     // entoure en blanc son panel
     if (id == 1)
     {
-        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid blue;}");
+        win_label.setStyleSheet("QLabel {background:white; border: 2px solid black; color: blue;}");
+
     } else {
-        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
+        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid red;}");
+        win_label.setStyleSheet("QLabel {background:white; border: 2px solid black; color: red;}");
+
     }
-
-    // affiche le label de victoire sur le plateau
-    win_label.setText("Bravo " + name + " vous avez gagné !");
-    win_label.setVisible(true);
 }
 
 
-// affiche le label de victoire
-// obsolète ?
-void Board::displayWinLabel(QString name)
-{
-    win_label.setText("Bravo " + name + "vous avez gagné !");
-    win_label.setVisible(true);
-}
+//// affiche le label de victoire
+//// obsolète ?
+//void Board::displayWinLabel(QString name)
+//{
+//    win_label.setText("Bravo " + name + "\nvous avez gagné !");
+//    win_label.setVisible(true);
+//}
 
 
 
@@ -603,6 +604,8 @@ void Board::goBack()
 }
 
 
+// recommence la partie en cours, ou bien relance une nouvelle partie
+// après qu'un joueur ait gagné
 void Board::resetGame()
 {
     // demande confirmation avant de remettre le jeu à 0
@@ -634,21 +637,6 @@ void Board::setUpdated(bool b)
 }
 
 
-//void Board::theresAWinner(int id, QString name)
-//{
-//    // entoure en blanc son panel
-//    if (id == 1)
-//    {
-//        this->player1_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
-//    } else {
-//        this->player2_groupbox.setStyleSheet("QGroupBox { border-radius: 9px;padding-right: 24px;padding-left: 24px;border: 5px solid white;}");
-//    }
-
-//    // affiche le label de victoire sur le plateau
-//    win_label.setText("Bravo " + name + " vous avez gagné !");
-//    win_label.setVisible(true);
-
-//}
 
 
 // ------------------------------------
@@ -662,6 +650,7 @@ pointer_to_arrays Board::getBoard()
 }
 
 
+// affichage de l'état du plateau dans la console
 void Board::printBoard()
 {
     for(int i=0; i<5; i++)

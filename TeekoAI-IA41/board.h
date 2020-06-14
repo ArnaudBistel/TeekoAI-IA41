@@ -30,7 +30,6 @@ public slots:
     void tileChosen();
     void resetGame();
     void goBack();
-//    void theresAWinner(int, QString);
     void announceWinner(int, QString);
     void placePion(int, int, int, bool, bool, bool);
     void displayPossibleMoves(int,int);
@@ -52,7 +51,6 @@ private:
     // ---------- PAWN & BOARD METHODS ----------
 
     void deletePossibleMoves();
-//    void enableBoard();
     void initBoardVisible();
     void initBoardInvisible();
     void reinit();
@@ -80,7 +78,6 @@ private:
 
     Pawn* array[5][5];
     QGridLayout but_and_image_layout;
-    QLabel win_label;
 
 
     // ----------------------------------
@@ -97,6 +94,7 @@ private:
     QLabel player2_name_label;
     QLabel player2_type_label;
     QLabel player2_color_label;
+    QLabel win_label;
 
 
     // ----------------------------------
