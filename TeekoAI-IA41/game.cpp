@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 661ee328bac5e1aceb991723c679bea804aa5c83
 #include "game.h"
 #include "Router.h"
 
@@ -453,6 +456,7 @@ bool Game::isPaused()
 {
     return this->pause;
 }
+<<<<<<< HEAD
 =======
 #ifndef BOARD_H
 #define BOARD_H
@@ -575,3 +579,5 @@ private:
 
 #endif // BOARD_H
 >>>>>>> 5d45124f65a85daa0f82fafad13012c1abd987a8
+=======
+>>>>>>> 661ee328bac5e1aceb991723c679bea804aa5c83
