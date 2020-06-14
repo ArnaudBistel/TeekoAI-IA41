@@ -54,21 +54,14 @@ Board::Board(QWidget *parent, QString name):
     // envoi du signal que le joueur a fait son choix
     connect(this,SIGNAL(playerPlayed(int)),  static_cast<Router*>(this->parent())->game,SLOT(playerPlayed(int)));
 
+    // réception de signal envoyé par le Game pour l'affichage
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(theresAWinner(int, QString)), this, SLOT(announceWinner(int, QString)));
-//    connect(static_cast<Router*>(this->parent())->game, SIGNAL(reinitBoard()), this, SLOT(reinit()));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(updateView(int, int, int, bool, bool, bool)), this, SLOT(placePion(int, int, int, bool, bool, bool)));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(displayPossibleMoves(int, int)), this, SLOT(displayPossibleMoves(int, int)));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(unselectPawn(int)), this, SLOT(unselectPawn(int)));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(prepareBoardForNextTurn(int, int)), this, SLOT(prepareBoardForCurrentPlayer(int, int)));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(displayCurrentPlayer(int)), this, SLOT(displayCurrentPlayer(int)));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(disableBoard()), this, SLOT(disableBoard()));
-
     connect(static_cast<Router*>(this->parent())->game, SIGNAL(enableBoard()), this, SLOT(enableBoard()));
 
 
@@ -105,7 +98,6 @@ Board::Board(QWidget *parent, QString name):
     int height = board_label.height() / 8.1;
 
     for(int i = 0;i<5;i++){
-//        std::vector<Pawn*> row;
         for(int j = 0;j<5;j++){
 
             Pawn *pawn = new Pawn("", &board_label);
@@ -113,14 +105,12 @@ Board::Board(QWidget *parent, QString name):
             pawn->setGeometry(x, y, height , height);
 
             // matrice de boutons/pions
-//            row.push_back(pawn);
             array[i][j] = pawn;
             pawn->setIndex(index);
             index++;
 
             x += board_label.height()/4.90;
         }
-//        array.push_back(row);
         x = board_label.height()/32.4;
         y += board_label.height()/4.89;
     }
@@ -227,7 +217,6 @@ Board::Board(QWidget *parent, QString name):
 // appelée par Game pour que la vue se mettent à jour et place le pion au bon endroit
 void Board::placePion(int id, int line, int col, bool selected, bool more_than_4, bool unselected)
 {
-    std::cout << "UPDATE ! " << std::endl ;
     // verrou pour la suynchronization
 //    QMutexLocker verrou(&mutex);
 
@@ -557,8 +546,6 @@ void Board::displayPlayers(QString player1, QString player2)
 // affiche qui est le vainqueur
 void Board::announceWinner(int id, QString name)
 {
-    std::cout << "WIN! " ;
-
     // entoure en blanc son panel
     if (id == 1)
     {

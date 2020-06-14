@@ -84,7 +84,7 @@ void Player::setPreviousIndex(int i)
 
 QString Player::getName()
 {
-    std::cout << this->name.toStdString() << std::endl;
+//    std::cout << this->name.toStdString() << std::endl;
     return this->name;
 
 }

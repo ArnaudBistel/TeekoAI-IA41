@@ -38,7 +38,7 @@ void Game::run()
         {
 
             // imprime le board dans la console
-            this->printBoard();
+//            this->printBoard();
 
             // on vérifie si le dernier déplacement a permis une victoire
             this->win = this->checkIfWins(current_player->getID());

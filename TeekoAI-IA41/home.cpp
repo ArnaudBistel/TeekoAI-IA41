@@ -115,10 +115,9 @@ Home::Home(QWidget *parent, QString name):
     // -------------------------------------
     connect(&quit_button, SIGNAL(clicked()), qApp, SLOT(quit()));
     buttons_layout.addWidget(&quit_button);
-
     buttons_layout.insertSpacing(1, screen_width / 4);
-
     restart_button.setVisible(false);
+
     connect(&restart_button, SIGNAL(clicked()), this->parent(), SLOT(restartGame()));
     buttons_layout.addWidget(&restart_button);
 

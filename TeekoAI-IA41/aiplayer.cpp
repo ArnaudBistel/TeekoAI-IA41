@@ -16,6 +16,7 @@ AIPlayer& AIPlayer::operator=(const AIPlayer& pl)
     this->move = pl.move;
     this->difficulty = pl.difficulty;
 
+//    std::cout << "dans = " << pl.name << std::endl;
     return *this;
 }
 
@@ -75,6 +76,7 @@ void AIPlayer::findMove(int  board [5][5])
             // choisi au hasard un pion à déplacer parmis ses 4 pions
             srand(time(NULL));
             move = (rand() % (MAX - MIN + 1)) + MIN;
+//            std::cout << "move : " << move << std::endl;
             move = pawns[move];
 
         // si l'IA a déjà placé ses 4 pions et qu'elle a choisi
@@ -89,6 +91,7 @@ void AIPlayer::findMove(int  board [5][5])
             // choisi au hasard un déplacement parmis les déplacements possibles
             srand(time(NULL));
             move = (rand() % (MAX - MIN + 1)) + MIN;
+//            std::cout << "move : " << move << std::endl;
             move = pawns[move];
 
         // si l'IA n'a pas encore placé ses 4 pions
@@ -105,13 +108,14 @@ void AIPlayer::findMove(int  board [5][5])
             {
                 move = (rand() % (MAX - MIN + 1)) + MIN;
             }
+
+//            std::cout << "move : " << move << std::endl;
         }
     }
     else{
         int bestValue, moveValue, bestIndex;
         bestValue = INT32_MIN;
 
-        // IA a placé ses 4 pions
         if (this->pionOnBoard()>=4){
             int bestPrevious;
             for(int i = 0 ; i<5 ; i++){
@@ -133,8 +137,6 @@ void AIPlayer::findMove(int  board [5][5])
                 }
             }
             this->setChosePionToMove(true);
-            std::cout << "best Previous : " << bestPrevious << std::endl;
-            std::cout << "best index : " << bestIndex << std::endl;
             this->setPreviousIndex(bestPrevious);
         }
         else{
@@ -335,27 +337,29 @@ int AIPlayer::checkPawnPotential(vector<int> pawns){
 
 int AIPlayer::checkPawnAlign(vector<int> pawns, int board[5][5]){
     int value = 0;
-    vector <vector <int>> sub;
-    createSubSequences(sub, pawns);
-    int maxSquare = 0, maxLine = 0, maxCol = 0, maxLDiag = 0, maxRDiag = 0;
-    for (int i = 0 ; i < (int) sub.size() ; i++){
-        if(isValidSquare(sub[i]) && canMakeSquare(sub[i],board)){
-            maxSquare = max(maxSquare,(int) pow(sub[i].size(),2));
+    if(pawns.size() > 0){
+        vector <vector <int>> sub;
+        createSubSequences(sub, pawns);
+        int maxSquare = 0, maxLine = 0, maxCol = 0, maxLDiag = 0, maxRDiag = 0;
+        for (int i = 0 ; i < (int) sub.size() ; i++){
+            if(isValidSquare(sub[i]) && canMakeSquare(sub[i],board)){
+                maxSquare = max(maxSquare,(int) pow(sub[i].size(),2));
+            }
+            if(isValidLine(sub[i]) && canMakeLine(sub[i],board)){
+                maxLine = max(maxLine,(int) pow(sub[i].size(),2));
+            }
+            if(isValidColumn(sub[i]) && canMakeCol(sub[i],board)){
+                maxCol = max(maxCol,(int) pow(sub[i].size(),2));
+            }
+            if(isValidDiag(sub[i],true) && canMakeRDiag(sub[i],board)){
+                maxRDiag = max(maxRDiag,(int) pow(sub[i].size(),2));
+            }
+            if(isValidDiag(sub[i], false) && canMakeLDiag(sub[i],board)){
+                maxLDiag = max(maxLDiag,(int) pow(sub[i].size(),2));
+            }
         }
-        if(isValidLine(sub[i]) && canMakeLine(sub[i],board)){
-            maxLine = max(maxLine,(int) pow(sub[i].size(),2));
-        }
-        if(isValidColumn(sub[i]) && canMakeCol(sub[i],board)){
-            maxCol = max(maxCol,(int) pow(sub[i].size(),2));
-        }
-        if(isValidDiag(sub[i],true) && canMakeRDiag(sub[i],board)){
-            maxRDiag = max(maxRDiag,(int) pow(sub[i].size(),2));
-        }
-        if(isValidDiag(sub[i], false) && canMakeLDiag(sub[i],board)){
-            maxLDiag = max(maxLDiag,(int) pow(sub[i].size(),2));
-        }
+        value = maxSquare + maxCol + maxLDiag + maxLine + maxRDiag;
     }
-    value = maxSquare + maxCol + maxLDiag + maxLine + maxRDiag;
     return value;
 }
 
@@ -652,11 +656,11 @@ bool AIPlayer::canMakeLDiag(vector<int> pawns, int board[5][5]){
 
 int AIPlayer::checkWin(vector <int> pawns ){
     int won, lineCount = 1, columnCount = 1, diag_rCount = 1, diag_lCount = 1, squareCount = 1;
-    int pawn = pawns[0];
     if(pawns.size() < 4){
         won = 0;
     }
     else{
+        int pawn = pawns[0];
         for(int i = 1 ; i<4 ; i++ ){
             if (pawns[i] == pawn + 1 && pawns[2] == pawns[0] + 5 && pawns[0] % 5 < 4 && pawns[0] < 20){
                 if(i == 2){
