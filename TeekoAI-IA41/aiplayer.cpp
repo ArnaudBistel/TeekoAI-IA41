@@ -1,6 +1,5 @@
 #include "aiplayer.h"
 
-// todo changer les if id == 2 par un controle qui checke l'ia courante
 
 AIPlayer::AIPlayer(QString name, int id, int difficulty )
     : Player(name, true, id), move(), difficulty(difficulty), pawn_to_move(-1), where_to_move_pawn(-1)
@@ -33,7 +32,7 @@ bool AIPlayer::operator== (AIPlayer &rhs)
 }
 
 
-
+//Fonction appelée dans game
 int AIPlayer::getIAMove(int  board [5][5])
 {
     this->findMove(board);
@@ -46,6 +45,7 @@ int AIPlayer::getDifficulty()
     return this->difficulty;
 }
 
+//Fontion principale qui appelle toutes les autres pour trouver le meilleur coup à chaque tour
 void AIPlayer::findMove(int  board [5][5])
 {
     // AI's pawns
@@ -109,21 +109,27 @@ void AIPlayer::findMove(int  board [5][5])
 //            std::cout << "move : " << move << std::endl;
         }
     }
+    //Si difficulté moyenne ou difficile
     else{
         int bestValue, moveValue, bestIndex;
         bestValue = INT32_MIN;
-
+        
+        //Si on a déjà placé les 4 pions
         if (this->pionOnBoard()>=4){
-            int bestPrevious;
+            int bestPrevious; //Correspond à la position du pion qu'on déplace pour la fonction setPreviousIndex
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
+                    //Pour chaque pion de l'IA on cherche les coups possibles
                     if (board[i][j] == this->getID()){
+                        //Pour chaque coup possible on crée un nouveau plateau avec ce mouvement et on appelle MinMax pour trouver le meilleur de ces placements
                         for (int index : computePossibleMoves(i*5 + j, board)){
                             int new_board[5][5];
                             this->copyBoard(board,new_board);
                             new_board[i][j] = 0;
                             new_board[index/5][index%5] = this->getID();
+                            //On appelle minMax en tant que Minimizer puisque le coup d'après est le coup de l'adversaire, comme on appelle minMax pour la première fois on initialise alpha et beta eu minimum et au maximum
                             moveValue = minMax(new_board,this->getDifficulty(), false,INT32_MIN,INT32_MAX);
+                            //Si on trouve un meilleure coup on met à jour bestValue, bestIndex et bestPrevious
                             if(moveValue > bestValue){
                                 bestValue = moveValue;
                                 bestIndex = index;
@@ -133,12 +139,15 @@ void AIPlayer::findMove(int  board [5][5])
                     }
                 }
             }
+            //Nécessaire puisque le joueur humain doit d'abord sélectionner un pion avant de jouer mais l'IA fait les deux en même temps
             this->setChosePionToMove(true);
             this->setPreviousIndex(bestPrevious);
         }
+        //Si moins de 4 pions posés
         else{
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
+                    //On teste toutes les cases libres et on évalue avec MinMax comme précedemment
                     if (board[i][j] == 0){
                         int new_board[5][5];
                         this->copyBoard(board,new_board);
@@ -155,15 +164,17 @@ void AIPlayer::findMove(int  board [5][5])
         }
         move = bestIndex;
     }
-
+    //On renvoie le déplacement à faire
     this->move = move;
 }
 
-
+//Fonction récursive principale de l'IA qui renvoie la valeur max d'un coup en prenant en compte que l'adversaire cherchera à minimiser notre score
+//Paramètres : int **board est le plateau de jeu 5*5, int depth représente la profondeur à laquelle on va
+//bool is_maximising : true si c'est un coup de l'IA false si c'est un coup de l'adversaire,int alpha et int beta pour l'élagage alpha beta
 int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, int beta){
 
     vector <int> ai, player;
-
+    //On récupère la position des pions de chaque joueur
     for(int i = 0 ; i<5 ; i++){
         for (int j = 0 ; j<5 ; j++){
             if(board[i][j] == this->id){
@@ -174,13 +185,15 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
             }
         }
     }
-
+    //Si noeud terminal on renvoie la fonction d'évaluation
     if(depth == 0 || checkWin(ai) == 1 || checkWin(player) == 1){
         return evaluateBoard(board);
     }
-
+    
+    //Si c'est un coup de l'IA à tester on cherche à maximiser
     if(is_maximizing){
         int bestValue = INT32_MIN;
+        //Si on a pas 4 pions posés on teste toutes les case libres et on récupère la meilleure valeur donnée par minMax
         if(ai.size() < 4){
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
@@ -188,8 +201,11 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                         int new_board[5][5];
                         this->copyBoard(board,new_board);
                         new_board[i][j] = this->getID();
+                        //On appelle à nouveau minMax en changeant is_maximizing pour false avec alpha qui peut varier à chaque appel et beta inchangé
                         bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
+                        //On met à jour beta
                         alpha = max(alpha,bestValue);
+                        //Elagage alpha beta
                         if(alpha >= beta)
                             return bestValue;
 
@@ -197,6 +213,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                 }
             }
         }
+        //Si 4 pions déjà posés on cherche le meilleur pion à bouger
         else{
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
@@ -206,8 +223,10 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                             this->copyBoard(board,new_board);
                             new_board[i][j] = 0;
                             new_board[index/5][index%5] = this->getID();
+                            //Comme au dessus on appelle minMax avec is_maximizing = false et alpha mis à jour béta inchangé
                             bestValue = max(bestValue,minMax(new_board,depth-1, false,alpha,beta));
                             alpha = max(alpha,bestValue);
+                            //Elagage alpha beta
                             if(alpha >= beta)
                                 return bestValue;
                         }
@@ -217,18 +236,25 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
         }
         return bestValue;
     }
+    //On est dans le cas de l'adversaire qui va chercher la valeur minimale possible selon le coup précédent de l'IA
     else{
         int bestValue = INT32_MAX;
+        //Permet d'obtenir la bonne id puisque id variable
         int playerID = ((this->getID() == 1) ? 2 : 1);
+        //Si moins de 4 pions posés par l'adversaire
         if(player.size() < 4){
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
+                    //On teste chaque case vide et on trouve la valeur donnée par minMax si on pose ce pion 
                     if (board[i][j] == 0){
                         int new_board[5][5];
                         this->copyBoard(board,new_board);
                         new_board[i][j] = playerID;
+                        //Cette fois on appelle minMax avec is_maximizing = true puisque le coup d'après est un coup de l'IA
+                        //Ici alpha reste fixe par rapport à l'appel initial mais beta est mis à jour
                         bestValue = min(bestValue,minMax(new_board,depth-1, true,alpha,beta));
                         beta = min(beta,bestValue);
+                        //Elagage alpha beta
                         if(alpha >= beta)
                             return bestValue;
 
@@ -236,6 +262,7 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
                 }
             }
         }
+        //Comme précedemment pour le maximizer si 4 pions sont déjà posés
         else{
             for(int i = 0 ; i<5 ; i++){
                 for(int j =0; j < 5 ; j++){
@@ -258,12 +285,12 @@ int AIPlayer::minMax(int (*board)[5], int depth, bool is_maximizing, int alpha, 
     }
 }
 
-
+//Fonction d'évaluation qui compare la valeur des pions de l'IA et celle des pions de l'adversaire
 int AIPlayer::evaluateBoard(int board[5][5]){
     int value;
-
+    
     vector <int> ai, player;
-
+    //On récupère les positions des pions de l'IA et de son adversaire
     for(int i = 0 ; i<5 ; i++){
         for (int j = 0 ; j<5 ; j++){
             if(board[i][j] == this->id){
@@ -274,7 +301,7 @@ int AIPlayer::evaluateBoard(int board[5][5]){
             }
         }
     }
-
+    //Selon la difficulté la fonction d'évaluation est plus précise (une fonction en plus et des coefficients différents)
     switch(this->getDifficulty()){
         case 2:
             value = 30*(checkWin(ai) - checkWin(player));
@@ -291,38 +318,45 @@ int AIPlayer::evaluateBoard(int board[5][5]){
     return value;
 }
 
-
+//Fonction qui calcule la distance d'un pion avec le pion précédent et renvoie une valeur plus élevée si les pions sont proches les un des autres
 int AIPlayer::checkPawnDistance(vector<int> pawns){
     int value = 0;
         if(pawns.size() > 1){
             for(int i = 1 ; i < (int) pawns.size(); i++){
                 value += (int) sqrt(std::pow((pawns[i] / 5) - (pawns[i-1] / 5),2 ) + std::pow((pawns[i] % 5) - (pawns[i-1] % 5),2));
             }
+            //Le but est d'avoir une valeur élevée si value est faible
             value = (pawns.size() *5)/value;
         }
 
         return value;
 }
 
+//Fonction qui calcule la moyenne des potentiels de chaque case
 int AIPlayer::checkPawnPotential(vector<int> pawns){
-
+   
     vector <int> corner = {0,4,20,24}, sideMid = {2,10,14,22}, sideCorner = {1,3,5,9,15,19,21,23}, middleCorner = {6,7,8,11,13,16,17,18}; //Number of possible combinaisons : corner (4) sideMid (5) sideCorner(6) middleCorner(10) middle (12)
 
     int value = 0;
     if(pawns.size()>1){
         for(int i = 0 ; i< (int) pawns.size() ; i++){
+            //Si le pion est dans un coin il ne peut faire que 4 combinaisons possible
             if (std::find(corner.begin(),corner.end(), pawns[i]) != corner.end()){
                 value += 2;
             }
+            //Si le pion est au milieu d'un côté il ne peut faire que 5 combinaisons possible
             else if (std::find(sideMid.begin(),sideMid.end(), pawns[i]) != sideMid.end()){
                 value += 4;
             }
+            //Si le pion est entre le coin et le milieu sur le côté il ne peut faire que 6 combinaisons possible
             else if (std::find(sideCorner.begin(),sideCorner.end(), pawns[i]) != sideCorner.end()){
                 value += 7;
             }
+            //Si le pion est dans le carré central sans la case centrale il peut faire 10 combinaisons possibles
             else if (std::find(middleCorner.begin(),middleCorner.end(), pawns[i]) != middleCorner.end()){
                 value += 11;
             }
+            //La case du milieu permet de faire 12 combinaisons possibles
             else{
                 value += 16;
             }
@@ -332,22 +366,30 @@ int AIPlayer::checkPawnPotential(vector<int> pawns){
     return value;
 }
 
+//Fonction qui détecte si une séquence de pions peut déboucher sur une combinaison gagnante
+//La fonction vérifie pour chaque combinaison gagnante (ligne,colonne,carré,diagonale) et le score et la somme des carrés de la taille de la meilleure séquence pour chaque combinaison
 int AIPlayer::checkPawnAlign(vector<int> pawns, int board[5][5]){
     int value = 0;
     if(pawns.size() > 0){
         vector <vector <int>> sub;
+        //On appelle cette fonction pour découper notre liste de pions en sous-séquences pour tester chaque sous-séquences
         createSubSequences(sub, pawns);
         int maxSquare = 0, maxLine = 0, maxCol = 0, maxLDiag = 0, maxRDiag = 0;
         for (int i = 0 ; i < (int) sub.size() ; i++){
+            //Si la séquence peut devenir un carré ET si les positions pour faire un carré sont libres
             if(isValidSquare(sub[i]) && canMakeSquare(sub[i],board)){
                 maxSquare = max(maxSquare,(int) pow(sub[i].size(),2));
             }
+            //Si la séquence peut devenir une ligne ET si les positions pour faire une ligne sont libres
             if(isValidLine(sub[i]) && canMakeLine(sub[i],board)){
                 maxLine = max(maxLine,(int) pow(sub[i].size(),2));
             }
+            //Si la séquence peut devenir une colonne ET si les positions pour faire une colonne sont libres
             if(isValidColumn(sub[i]) && canMakeCol(sub[i],board)){
                 maxCol = max(maxCol,(int) pow(sub[i].size(),2));
             }
+            //Les deux conditions suivantes vérifient la même chose pour des diagonales mais pour un soucis de clarté on a divisé
+            //les possibilités en 2 soit une diagonale descend à gauche soit à droite
             if(isValidDiag(sub[i],true) && canMakeRDiag(sub[i],board)){
                 maxRDiag = max(maxRDiag,(int) pow(sub[i].size(),2));
             }
@@ -360,13 +402,14 @@ int AIPlayer::checkPawnAlign(vector<int> pawns, int board[5][5]){
     return value;
 }
 
-
+//Fonction qui vérifie si la combinaison peut faire un carré sans prendre en compte les pions adverses
 bool AIPlayer::isValidSquare(vector<int> pawns){
     bool valid = false;
+    //Peu importe où est placé le pion, tout pion peut faire un carré
     if(pawns.size() == 1){
         valid = true;
     }
-    else if (pawns.size() == 2){ //Any linked line, column or diag is a 2 pawns square
+    else if (pawns.size() == 2){ //Toute ligne, colonne ou diagonale collée est un carré potentiel
         if (pawns[0] + 1 == pawns[1] && pawns[1] %5 != 0){
             valid = true;
         }
@@ -380,7 +423,7 @@ bool AIPlayer::isValidSquare(vector<int> pawns){
             valid = true;
         }
     }
-    else if (pawns.size() == 3){ //3 pawns square forms a L shape
+    else if (pawns.size() == 3){ //Un carré potentiel à 3 pions est un L
         if (pawns[0] + 1 == pawns[1] && pawns[1] %5 != 0){
             if(pawns[2] == pawns[0] + 5 || pawns[2] == pawns[0] + 6){
                 valid = true;
@@ -392,6 +435,7 @@ bool AIPlayer::isValidSquare(vector<int> pawns){
             }
         }
     }
+    //On vérifie que c'est bien un carré formé
     else{
         if (pawns[0] / 5 != 4 && pawns[0] % 5 != 4 && pawns[1] == pawns[0] + 1 && pawns[2] == pawns[0] + 5 && pawns[3] == pawns[0] + 6){
             valid = true;
@@ -400,12 +444,14 @@ bool AIPlayer::isValidSquare(vector<int> pawns){
     return valid;
 }
 
+//Fonction qui vérifie si la combinaison peut faire une colonne sans prendre en compte les pions adverses
 bool AIPlayer::isValidColumn(vector<int> pawns){
     bool valid = false;
     if(pawns.size() == 1){
         valid = true;
     }
     else{
+        //On vérifie que chaque pion est sur la même colonne et que les pions ne sont pas à 5 cases d'écart
         for(int i = 1 ; i< (int) pawns.size() ; i++){
             if(pawns[i] % 5 == pawns[i-1] % 5 && pawns[pawns.size() -1 ] - pawns[0] < 16 ){
                 valid = true;
@@ -419,6 +465,7 @@ bool AIPlayer::isValidColumn(vector<int> pawns){
     return valid;
 }
 
+//Fonction qui vérifie si la combinaison peut faire une ligne sans prendre en compte les pions adverses
 bool AIPlayer::isValidLine(vector<int> pawns){
     bool valid = false;
 
@@ -426,6 +473,7 @@ bool AIPlayer::isValidLine(vector<int> pawns){
         valid = true;
     }
     else{
+        //On vérifie que chaque pion est sur la même ligne et qu'il ne sont pas à 5 cases d'écart
         for(int i = 1 ; i< (int) pawns.size() ; i++){
             if(pawns[i] / 5 == pawns[i-1] / 5 && pawns[pawns.size() -1 ] - pawns[0] < 4 ){
                 valid = true;
@@ -439,16 +487,21 @@ bool AIPlayer::isValidLine(vector<int> pawns){
     return valid;
 }
 
+//Fonction qui vérifie si la combinaison peut faire une diagonale sans prendre en compte les pions adverses
+//Le parametre right permet de dissocier une diagonale à droite ou à gauche
 bool AIPlayer::isValidDiag(vector<int> pawns, bool right){
 
     bool valid = false;
+    //Seules certaines cases permettent une diagonale
     vector <int> possible_r = {0,1,5,6,7,11,12,13,17,18,19,23,24}, possible_l = {3,4,7,8,9,11,12,13,15,16,17,20,21};
 
     if(right){
+        //Si le premier pion n'est pas à une case possible c'est faux
         if(std::find(possible_r.begin(),possible_r.end(),pawns[0]) != possible_r.end()){
             if(pawns.size() == 1){
                 valid = true;
             }
+            //On vérifie que chaque pion est sur la diagonale 
             else{
                 for(int i = 1; i<(int)pawns.size();i++){
                     if ((pawns[i] - pawns[i-1]) % 6 == 0 && pawns[i]%5 >= i){
@@ -464,11 +517,13 @@ bool AIPlayer::isValidDiag(vector<int> pawns, bool right){
 
     }
     else{
+        //Si le premier pion n'est pas à une case possible c'est faux
         if(std::find(possible_l.begin(),possible_l.end(),pawns[0]) != possible_l.end()){
             if(pawns.size() == 1){
                 valid = true;
             }
             else{
+                //On vérifie que chaque pion est sur la diagonale 
                 for(int i = 1; i<(int)pawns.size();i++){
                     if ((pawns[i] - pawns[i-1]) % 4 == 0 && pawns[i]%5 <= (4-i)){
                         valid = true;
@@ -485,6 +540,7 @@ bool AIPlayer::isValidDiag(vector<int> pawns, bool right){
     return valid;
 }
 
+//Fonction qui vérifie que le carré est bien faisable en prenannt en compte les pions adverses, utilisés avec isValidSquare donc on sait déjà que le carré peut être fait
 bool AIPlayer::canMakeSquare(vector<int> pawns, int board[5][5]){
     bool result = false;
     int x,row,col,thisId,otherId;
@@ -494,7 +550,7 @@ bool AIPlayer::canMakeSquare(vector<int> pawns, int board[5][5]){
     thisId = board[row][col];
     otherId = (thisId == 1) ? 2 : 1;
     if(pawns.size() == 1){
-
+        //à partir d'un pion on a 4 carrés potentiels donc on vérifie qu'au moins 1 de ces carrés est possible
         if(row > 0 && col > 0){
             if(board[row-1][col-1] != otherId && board[row-1][col] != otherId && board[row][col-1] != otherId)
                 result = true;
@@ -513,34 +569,42 @@ bool AIPlayer::canMakeSquare(vector<int> pawns, int board[5][5]){
         }
     }
     else if (pawns.size() == 2){
+        //Avec 2 pions on a 6 carrés possibles 
+        //Si les deux pions sont sur la même ligne
         if(pawns[1] == x +1){
             if(row > 0 && board[row-1][col] != otherId && board[row-1][col+1] != otherId)
                 result = true;
             if(row < 4 && board[row+1][col] != otherId && board[row+1][col+1] != otherId)
                 result = true;
         }
+        //Si les deux pions sont en diagonale gauche
         else if(pawns[1] == x +4){
             if(board[row+1][col] != otherId && board[row][col-1] != otherId)
                 result = true;
         }
+        //Si les deux pions forment une colonne
         else if(pawns[1] == x +5){
             if(col > 0 && board[row][col-1] != otherId && board[row+1][col-1] != otherId)
                 result = true;
             if(col < 4 && board[row][col+1] != otherId && board[row+1][col+1] != otherId)
                 result = true;
         }
+        //Si les deux pions sont en diagonale droite
         else if(pawns[1] == x +6){
             if(board[row+1][col] != otherId && board[row][col+1] != otherId)
                 result = true;
         }
     }
     else if (pawns.size() == 3){
+        //Si on a 3 pions on a 4 possibilités
+        //Si le troisième pion est en colonne avec le premier on a 2 possibilités
         if(pawns[2] == x +5){
             if(pawns[1] == x+1 && board[row+1][col+1] != otherId)
                 result = true;
             if(pawns[1] == x+4 && board[row][col-1] != otherId)
                 result = true;
         }
+        //Si le troisième pion n'est pas en colonne avec le deuxième on a 2 possibilités
         else{
             if(pawns[1] == x+1 && board[row+1][col] != otherId)
                 result = true;
@@ -548,12 +612,14 @@ bool AIPlayer::canMakeSquare(vector<int> pawns, int board[5][5]){
                 result = true;
         }
     }
+    //Vraie puisqu'on a déjà vérifié que c'était un carré possible
     else{
         result = true;
     }
     return result;
 }
 
+//Fonction qui vérifie que la ligne est bien faisable en prenannt en compte les pions adverses, utilisés avec isValidLine donc on sait déjà que la ligne peut être faite
 bool AIPlayer::canMakeLine(vector<int> pawns, int board[5][5]){
     bool result = false;
     int x,row,col,thisId,otherId;
@@ -562,12 +628,16 @@ bool AIPlayer::canMakeLine(vector<int> pawns, int board[5][5]){
     col = x%5;
     thisId = board[row][col];
     otherId = (thisId == 1) ? 2 : 1;
+    //Les 3 cases centrales de la ligne doivent être libre ou possédée par le joueur 
     if(board[row][1] != otherId && board[row][2] != otherId && board[row][3] != otherId){
+        //Si les 3 centrales sont posssibles il faut vérifier les deux sur les bords
         if(board[row][0] != otherId || board[row][4] != otherId)
             result = true;
     }
     return result;
 }
+
+//Fonction qui vérifie que la colonne est bien faisable en prenannt en compte les pions adverses, utilisés avec isValidCol donc on sait déjà que la colonne peut être faite
 bool AIPlayer::canMakeCol(vector<int> pawns, int board[5][5]){
     bool result = false;
     int x,row,col,thisId,otherId;
@@ -576,12 +646,16 @@ bool AIPlayer::canMakeCol(vector<int> pawns, int board[5][5]){
     col = x%5;
     thisId = board[row][col];
     otherId = (thisId == 1) ? 2 : 1;
+    //Comme pour la ligne on vérifie que les 3 places centrales de la colonne sont possible
     if(board[1][col] != otherId && board[2][col] != otherId && board[3][col] != otherId){
+        //Si les positions centrales sont possible on vérifie les deux aux extrémités
         if(board[0][col] != otherId || board[4][col] != otherId)
             result = true;
     }
     return result;
 }
+
+//Fonction qui vérifie que la diagonale droite est bien faisable en prenannt en compte les pions adverses, utilisés avec isValidDiag donc on sait déjà que la diagonale peut être faite
 bool AIPlayer::canMakeRDiag(vector<int> pawns, int board[5][5]){
     bool result = false;
     int x,row,col,thisId,otherId;
@@ -590,17 +664,23 @@ bool AIPlayer::canMakeRDiag(vector<int> pawns, int board[5][5]){
     col = x%5;
     thisId = board[row][col];
     otherId = (thisId == 1) ? 2 : 1;
+    //Si on est sur la diagonale centrale on a deux possibilités puisqu'il y à 5 cases
     if(row == col){
+        //On vérifie les 3 centrales
         if(board[1][1] != otherId && board[2][2] != otherId && board[3][3] != otherId){
+            //Puis les extrémités
             if(board[0][0] != otherId || board[4][4] != otherId)
                 result = true;
         }
     }
+    //Sinon on a deux diagonales possibles
     else{
+        //On remonte la diagonale pour ensuite redescendre
         while(row > 0 && col > 0){
             row--;
             col--;
         }
+        //On redescend en vérifiant chaque position
         for(int i = 0;i<4;i++){
             if (board[row][col] != otherId){
                 result = true;
@@ -615,6 +695,9 @@ bool AIPlayer::canMakeRDiag(vector<int> pawns, int board[5][5]){
     }
     return result;
 }
+
+//Fonction qui vérifie que la diagonale gauche est bien faisable en prenannt en compte les pions adverses, utilisés avec isValidDiag donc on sait déjà que la diagonale peut être faite
+//Cette fonction marche exactement comme la fonction ci-dessus 
 bool AIPlayer::canMakeLDiag(vector<int> pawns, int board[5][5]){
     bool result = false;
     int x,row,col,thisId,otherId;
@@ -650,7 +733,7 @@ bool AIPlayer::canMakeLDiag(vector<int> pawns, int board[5][5]){
 }
 
 
-
+//On vérifie si les 4 pions sont une combinaison gagnante
 int AIPlayer::checkWin(vector <int> pawns ){
     int won, lineCount = 1, columnCount = 1, diag_rCount = 1, diag_lCount = 1, squareCount = 1;
     if(pawns.size() < 4){
@@ -659,6 +742,7 @@ int AIPlayer::checkWin(vector <int> pawns ){
     else{
         int pawn = pawns[0];
         for(int i = 1 ; i<4 ; i++ ){
+            //On vérifie que ça forme un carré
             if (pawns[i] == pawn + 1 && pawns[2] == pawns[0] + 5 && pawns[0] % 5 < 4 && pawns[0] < 20){
                 if(i == 2){
                     pawn = pawns[i];
@@ -668,24 +752,29 @@ int AIPlayer::checkWin(vector <int> pawns ){
                 }
                 squareCount++;
             }
+            //On vérifie que chaque pion est à droite du précédent
             else if(pawns[i] == pawn +1 && pawns[0]%5 <2){
                 pawn = pawns[i];
                 lineCount++;
             }
+            //On vérifie que chaque pion est sous le précédent
             else if (pawns[i] == pawn +5 && pawns[0] < 10){
                 pawn = pawns[i];
                 columnCount++;
             }
+            //On vérifie que chaque pion est en diagonale à droite du précédent
             else if(pawns[i] == pawn + 6 && pawns[0] % 5 < 2 && pawns[0] <7){
                 pawn = pawns[i];
                 diag_rCount++;
             }
+            //On vérifie que chaque pion est en diagonale à gauche du précédent
             else if (pawns[i] == pawn + 4 && pawns[0] % 5 > 2 && pawns[0] < 10){
                 pawn = pawns[i];
                 diag_lCount++;
             }
 
         }
+        //Si une combinaison gagante trouvée on a gagné
         if(lineCount == 4 || columnCount == 4 || diag_lCount == 4 || diag_rCount == 4 || squareCount == 4)
             won = 1;
         else
@@ -921,7 +1010,7 @@ std::vector<int> AIPlayer::computeSquaresAroundSquare(int index, int  board [5][
     return pawns;
 }
 
-
+//Découpe un vecteur en sous séquences 
 void AIPlayer::createSubSequences(vector<vector<int>> &sub, vector<int> vec){
     int n = vec.size();
         int num = pow(2,n);
